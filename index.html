@@ -69,6 +69,21 @@
         .topbar-btn.primary{background:var(--navy2);color:#fff}.topbar-btn.primary:hover{background:var(--teal)}
         .topbar-btn.secondary{background:var(--white);border:1.5px solid var(--border);color:var(--navy2)}.topbar-btn.secondary:hover{background:var(--light2)}
 
+        /* ── Topbar catálogo: flex-wrap para móvil ── */
+        .cat-topbar{
+          height:auto !important;
+          flex-wrap:wrap;
+          padding:.45rem .7rem !important;
+          gap:.4rem !important;
+          row-gap:.4rem;
+        }
+        .cat-topbar .back-btn{flex-shrink:0}
+        .cat-topbar .topbar-btn{flex:1;min-width:0;justify-content:center;font-size:.75rem;padding:.38rem .5rem}
+        @media(min-width:480px){
+          .cat-topbar{flex-wrap:nowrap;height:56px !important;padding:0 1rem !important}
+          .cat-topbar .topbar-btn{flex:none;font-size:.78rem;padding:.38rem .85rem}
+        }
+
         /* Scrollable content area */
         .scroller{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1.1rem}
         .scroller::-webkit-scrollbar{width:5px}
@@ -1226,24 +1241,22 @@
      SCREEN: CATÁLOGO DE FAMILIAS
 ════════════════════════════ -->
 <div class="screen" id="screen-catalogo">
-    <div class="topbar">
+    <div class="topbar cat-topbar">
         <button class="back-btn" onclick="irA('screen-home')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
             Inicio
         </button>
-        <span class="topbar-title">Catálogo de Familias</span>
         <button class="topbar-btn secondary" onclick="abrirModalImportarCat()" title="Importar desde Excel/CSV">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Importar
         </button>
-        <button class="topbar-btn secondary" onclick="exportarCatalogoExcel()" title="Exportar catálogo a Excel">
+        <button class="topbar-btn secondary" onclick="copiarCatalogoTabla()" title="Exportar catálogo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Exportar
         </button>
-
         <button class="topbar-btn primary" onclick="abrirModalNuevaVivienda()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Nueva
+            + Nueva
         </button>
     </div>
     <div class="cat-search-wrap">
@@ -3562,7 +3575,9 @@
       localStorage.setItem('rdps_catalogo', JSON.stringify(cat));
     }
 
-    function renderCatalogo() {
+    function renderCatalogo(opcs) {
+      // opcs.renderCompleto: true → deshabilita carga por lotes (necesario para scrollIntoView)
+      const _renderCompleto = opcs && opcs.renderCompleto;
       const cat = getCatalogo();
       const cont = document.getElementById('catalogo-lista');
       const q = (document.getElementById('cat-buscador')?.value || '').trim().toLowerCase();
@@ -3663,10 +3678,18 @@
       }
 
       const LOTE = 10; // viviendas visibles al inicio
-      cont.innerHTML = catFiltrado.slice(0, LOTE).map(_htmlVivienda).join('');
 
       // Desconectar observer anterior si existía
       if (cont._catObserver) cont._catObserver.disconnect();
+
+      // Si se requiere render completo (ej. después de verFamiliaCompleta para scrollIntoView),
+      // renderizar todas las viviendas de una vez sin lazy loading
+      if (_renderCompleto) {
+        cont.innerHTML = catFiltrado.map(_htmlVivienda).join('');
+        return;
+      }
+
+      cont.innerHTML = catFiltrado.slice(0, LOTE).map(_htmlVivienda).join('');
 
       if (catFiltrado.length > LOTE) {
         // Centinela al final para cargar más al hacer scroll
@@ -3701,7 +3724,9 @@
       _catPersonaSeleccionada = { vivId, perId };
       const inp = document.getElementById('cat-buscador');
       if (inp) inp.value = '';
-      renderCatalogo();
+      // renderCompleto:true asegura que TODAS las viviendas estén en el DOM
+      // antes de intentar scrollIntoView (evita el bug de lazy loading)
+      renderCatalogo({ renderCompleto: true });
       setTimeout(() => {
         const card = document.querySelector(`[data-viv-id="${vivId}"]`);
         if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3797,12 +3822,14 @@
         const num = document.getElementById('mcat-vivienda-num').value.trim();
         if (!num) { toast('Ingresa el número de vivienda', 'error'); return; }
         if (cat.find(v => v.vivienda === num)) { toast('Esa vivienda ya existe', 'error'); return; }
+        const nuevaId = 'viv_' + Date.now();
         const ts = new Date().toISOString();
-        cat.push({ id: 'viv_' + Date.now(), vivienda: num, personas: [], actualizadoEn: ts });
+        cat.push({ id: nuevaId, vivienda: num, personas: [], actualizadoEn: ts });
         saveCatalogo(cat);
         renderCatalogo();
-        cerrarModalCat();
         toast('🏠 Vivienda ' + num + ' agregada', 'success');
+        // Abrir inmediatamente el modal para agregar el primer integrante
+        abrirModalNuevaPersona(nuevaId);
       } else {
         const nombre = document.getElementById('mcat-nombre').value.trim();
         if (!nombre) { toast('Ingresa el nombre', 'error'); return; }
