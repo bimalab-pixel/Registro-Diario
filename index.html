@@ -4,6 +4,9 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <title>Registro Diario — Promotor de Salud</title>
+	
+	<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a3d2e">
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -913,19 +916,15 @@
         .firebase-status.ok{background:rgba(0,184,156,.2);color:#7effd9;border-color:rgba(0,184,156,.3)}
         .firebase-status.err{background:rgba(192,57,43,.2);color:#ffaaaa;border-color:rgba(192,57,43,.3)}
     </style>
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json"/>
-    <meta name="theme-color" content="#0a3d2e"/>
-    <meta name="mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-    <meta name="apple-mobile-web-app-title" content="Registro Promotor"/>
-    <link rel="apple-touch-icon" href="icon-192.png"/>
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png"/>
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
 </head>
 <body>
+
+<div id="install-container" style="display: none; padding: 15px; text-align: center; background: var(--light2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 9999;">
+    <p style="margin: 0 0 10px 0; color: var(--navy); font-weight: bold;">Disponible para usar sin conexión</p>
+    <button id="btnInstall" style="background: var(--navy); color: white; border: none; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif;">
+        Instalar Aplicación
+    </button>
+</div>
 
 <!-- ════════════════════════════
      SCREEN: HOME / MENÚ
@@ -1227,12 +1226,12 @@
      SCREEN: CATÁLOGO DE FAMILIAS
 ════════════════════════════ -->
 <div class="screen" id="screen-catalogo">
-    <div class="topbar" style="overflow-x:auto;flex-wrap:nowrap;">
+    <div class="topbar">
         <button class="back-btn" onclick="irA('screen-home')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
             Inicio
         </button>
-        <span class="topbar-title" style="flex-shrink:1;min-width:3rem;">Catálogo</span>
+        <span class="topbar-title">Catálogo de Familias</span>
         <button class="topbar-btn secondary" onclick="abrirModalImportarCat()" title="Importar desde Excel/CSV">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Importar
@@ -1241,9 +1240,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Exportar
         </button>
+
         <button class="topbar-btn primary" onclick="abrirModalNuevaVivienda()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            + Nueva
+            Nueva
         </button>
     </div>
     <div class="cat-search-wrap">
@@ -3165,80 +3165,7 @@
     </div>
 
     </div>
-    
-<!-- ═══════════════ PWA INSTALL BANNER ═══════════════ -->
-<div id="pwa-banner" style="
-  display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
-  background:linear-gradient(135deg,#0a3d2e,#0e5c44);
-  color:#fff;padding:1rem 1.2rem;
-  box-shadow:0 -4px 24px rgba(0,0,0,.35);
-  border-top:2px solid #00b89c;
-  display:none;align-items:center;gap:.9rem;
-  font-family:'DM Sans',sans-serif;
-">
-  <div style="width:44px;height:44px;flex-shrink:0;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.3)">
-    <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover"/>
-  </div>
-  <div style="flex:1;min-width:0">
-    <div style="font-weight:700;font-size:.92rem;line-height:1.2">Instalar Registro Promotor</div>
-    <div style="font-size:.72rem;color:rgba(255,255,255,.7);margin-top:2px">Funciona sin internet · Acceso rápido</div>
-  </div>
-  <button id="pwa-install-btn" style="
-    background:#00b89c;color:#fff;border:none;border-radius:8px;
-    padding:.5rem 1rem;font-weight:700;font-size:.82rem;
-    cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;
-  ">Instalar</button>
-  <button onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-banner-dismissed','1')" style="
-    background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
-    border-radius:8px;padding:.5rem .7rem;cursor:pointer;font-size:.8rem;
-    font-family:inherit;flex-shrink:0;
-  ">✕</button>
-</div>
-
-<script>
-// ── Service Worker ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(r => console.log('SW registrado:', r.scope))
-      .catch(e => console.warn('SW error:', e));
-  });
-}
-
-// ── Banner de instalación ──
-let _deferredPrompt = null;
-const _banner = document.getElementById('pwa-banner');
-const _installBtn = document.getElementById('pwa-install-btn');
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _deferredPrompt = e;
-  // Solo mostrar si no fue descartado previamente
-  if (!localStorage.getItem('pwa-banner-dismissed') && !window.matchMedia('(display-mode: standalone)').matches) {
-    _banner.style.display = 'flex';
-  }
-});
-
-_installBtn && _installBtn.addEventListener('click', async () => {
-  if (!_deferredPrompt) return;
-  _deferredPrompt.prompt();
-  const { outcome } = await _deferredPrompt.userChoice;
-  _deferredPrompt = null;
-  _banner.style.display = 'none';
-  if (outcome === 'accepted') {
-    localStorage.removeItem('pwa-banner-dismissed');
-  }
-});
-
-// Ocultar banner si ya está instalada (modo standalone)
-window.addEventListener('appinstalled', () => {
-  _banner.style.display = 'none';
-  localStorage.removeItem('pwa-banner-dismissed');
-  console.log('PWA instalada ✅');
-});
-</script>
-
-</body></html>`;
+    </body></html>`;
     }
 
     function htmlReporteDiario(lista, fecha, subtitulo) {
@@ -4781,6 +4708,50 @@ window.addEventListener('appinstalled', () => {
     }
 
 
+</script>
+
+<script>
+  let deferredPrompt;
+  const installContainer = document.getElementById('install-container');
+  const btnInstall = document.getElementById('btnInstall');
+
+  // Lógica para capturar el evento de instalación
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Evita que el navegador muestre su propio aviso automático
+    e.preventDefault();
+    // Guarda el evento para dispararlo luego
+    deferredPrompt = e;
+    // Muestra nuestro botón personalizado
+    installContainer.style.display = 'block';
+  });
+
+  // Acción al presionar el botón de instalar
+  btnInstall.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`Resultado de la instalación: ${outcome}`);
+      deferredPrompt = null;
+      // Ocultar el botón inmediatamente después de la acción
+      installContainer.style.display = 'none';
+    }
+  });
+
+  // Ocultar el botón si la app ya se instaló satisfactoriamente
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA instalada correctamente');
+    installContainer.style.display = 'none';
+  });
+
+  // Registro del Service Worker (Fundamental para offline)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // Usamos el nombre del archivo que subiste
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registrado', reg))
+        .catch(err => console.error('Error al registrar SW', err));
+    });
+  }
 </script>
 </body>
 </html>
