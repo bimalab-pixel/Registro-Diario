@@ -3710,23 +3710,33 @@ function _riesgoParsearNota(texto, nombre) {
   }
   // Patrón 4: abreviaturas y variaciones "psa", "pso", "pt", "p."
   if (datos.pesoKg == null) {
-    m = t.match(/\b(?:psa|pso|pt|p\.)\s*[:\-]?\s*(\d+)\s*[.,]\s*(\d+)\b/i);
-    if (m) datos.pesoKg = parseFloat(m[1] + '.' + m[2]);
-    else {
-      m = t.match(/\b(?:psa|pso|pt|p\.)\s*[:\-]?\s*(\d+(?:[.,]\d+)?)\b/i);
-      if (m) datos.pesoKg = parseFloat(m[1].replace(',', '.'));
-    }
-  }
-  // Patrón 5: "pesa/peso" con número (ej. "pesa 59.5", "peso de 65 kg")
-  if (datos.pesoKg == null) {
-    m = t.match(/\bpes(?:a|o)\w*\b\s*(?:de\s+)?[:\-]?\s*(\d+)\s*[.,]\s*(\d+)/i);
+    m = t.match(/\b(?:psa|pso|pt|p\.)\s*[:\-]?\s*(\d+)\s*[.,]\s*(\d+)\s*(libras?|lb\.?s?|lbs?)?\b/i);
     if (m) {
-      datos.pesoKg = parseFloat(m[1] + '.' + m[2]);
+      const v = parseFloat(m[1] + '.' + m[2]);
+      datos.pesoKg = m[3] ? Math.round(v * 0.453592 * 10) / 10 : v;
     } else {
-      m = t.match(/\bpes(?:a|o)\w*\b\s*(?:de\s+)?[:\-]?\s*(\d+(?:[.,]\d+)?)\b/i);
+      m = t.match(/\b(?:psa|pso|pt|p\.)\s*[:\-]?\s*(\d+(?:[.,]\d+)?)\s*(libras?|lb\.?s?|lbs?)?\b/i);
       if (m) {
         const v = parseFloat(m[1].replace(',', '.'));
-        if (v >= 1.5 && v <= 400) datos.pesoKg = v;
+        datos.pesoKg = m[2] ? Math.round(v * 0.453592 * 10) / 10 : v;
+      }
+    }
+  }
+  // Patrón 5: "pesa/peso" con número (ej. "pesa 59.5", "peso de 65 kg", "pesa 155 libras")
+  if (datos.pesoKg == null) {
+    m = t.match(/\bpes(?:a|o)\w*\b\s*(?:de\s+)?[:\-]?\s*(\d+)\s*[.,]\s*(\d+)\s*(libras?|lb\.?s?|lbs?)?/i);
+    if (m) {
+      const v = parseFloat(m[1] + '.' + m[2]);
+      datos.pesoKg = m[3] ? Math.round(v * 0.453592 * 10) / 10 : v;
+    } else {
+      m = t.match(/\bpes(?:a|o)\w*\b\s*(?:de\s+)?[:\-]?\s*(\d+(?:[.,]\d+)?)\s*(libras?|lb\.?s?|lbs?)?\b/i);
+      if (m) {
+        const v = parseFloat(m[1].replace(',', '.'));
+        if (m[2]) {
+          datos.pesoKg = Math.round(v * 0.453592 * 10) / 10;
+        } else if (v >= 1.5 && v <= 400) {
+          datos.pesoKg = v;
+        }
       }
     }
   }
