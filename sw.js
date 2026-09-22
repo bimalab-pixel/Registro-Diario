@@ -3,7 +3,7 @@
 //  Estrategia: Cache-First para assets, Network-First para datos
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'registro-promotor-v9';
+const CACHE_NAME = 'registro-promotor-v10';
 
 // Archivos a cachear al instalar
 const PRECACHE_URLS = [
