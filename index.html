@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script src="storage-shim.js"></script>
+
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <title>Registro Diario — Promotor de Salud</title>
@@ -11,7 +13,7 @@
     <link rel="apple-touch-icon" href="icon-192.png"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-    <script>
+    <script type="text/x-deferred">
     // Registro del Service Worker (habilita instalación y uso offline)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -26,7 +28,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
     <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/></noscript>
     <!-- XLSX: carga diferida — solo se necesita al importar Excel -->
-    <script>
+    <script type="text/x-deferred">
     window._xlsxReady = false;
     function _cargarXLSX(cb) {
       if (typeof XLSX !== 'undefined') { cb(); return; }
@@ -123,7 +125,7 @@
 
         .home-header{
           padding:2.5rem 1.5rem 1.5rem;display:flex;flex-direction:column;align-items:center;
-          flex-shrink:0;
+          flex-shrink:0;position:relative;
         }
         .home-logo{
           width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,var(--teal2),var(--navy));
@@ -251,7 +253,6 @@
         #screen-home.tema-oscuro .firebase-status.err{background:rgba(192,57,43,.2);color:#ffaaaa;border-color:rgba(192,57,43,.3);}
 
         /* Botón de alternar tema (sol/luna) en Inicio */
-        .home-header{position:relative;}
         .home-tema-toggle{
           position:absolute;top:1rem;right:1rem;width:38px;height:38px;border-radius:50%;
           border:1.5px solid var(--border);background:var(--white);color:var(--navy2);
@@ -310,7 +311,6 @@
         .icon-btn.edit:hover{background:var(--navy2);border-color:var(--navy2);color:#fff}
         .icon-btn.iprint:hover{background:var(--teal);border-color:var(--teal);color:#fff}
         .icon-btn.del:hover{background:var(--danger);border-color:var(--danger);color:#fff}
-        .icon-btn.map:hover{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
         .icon-btn.nutri{
           color:#fff;border-color:transparent;
           background:linear-gradient(135deg,#22c55e 0%,#0ea5e9 100%);
@@ -343,6 +343,49 @@
           background:transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;
         }
         .ctrl-firma-btn:hover{background:var(--gold);border-color:var(--gold)}
+        /* Seguimiento por grupos etarios */
+        .ge-tabla{width:100%;border-collapse:collapse;font-size:.8rem;background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.7rem}
+        .ge-tabla th{background:var(--navy);color:#fff;font-weight:700;font-size:.72rem;padding:.45rem .55rem;text-align:left}
+        .ge-tabla td{padding:.5rem .55rem;border-top:1px solid var(--light2);vertical-align:middle}
+        .ge-tabla .ge-c-n{width:2rem;text-align:right;color:var(--muted);font-weight:700}
+        .ge-tabla .ge-c-p{width:4.2rem;text-align:right;font-weight:800;font-size:.95rem;color:var(--navy2)}
+        .ge-fila{cursor:pointer;transition:background .12s}
+        .ge-fila:active{background:var(--light)}
+        .ge-fila.sel{background:#e8f8f4;box-shadow:inset 3px 0 0 var(--teal2)}
+        .ge-total td{border-top:2px solid var(--border);background:var(--light)}
+        .ge-total.sel{background:#e8f8f4}
+        .ge-gnombre{font-weight:700;color:var(--navy2)}
+        .ge-gdetalle{font-size:.68rem;color:var(--muted);margin-top:1px}
+        .ge-lista-titulo{font-size:.82rem;font-weight:800;color:var(--navy);margin:.3rem 0 .6rem}
+        .ge-buscar{position:relative;margin:0 0 .6rem}
+        .ge-buscar svg{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+        .ge-buscar input{width:100%;box-sizing:border-box;padding:.6rem 2.2rem .6rem 2.1rem;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:.9rem;background:#fff;color:var(--text);outline:none}
+        .ge-buscar input:focus{border-color:var(--teal2)}
+        .ge-buscar-x{position:absolute;right:.35rem;top:50%;transform:translateY(-50%);border:none;background:transparent;color:var(--muted);font-size:1.1rem;line-height:1;padding:.35rem .5rem;cursor:pointer;display:none}
+        .ge-n{color:var(--muted);font-weight:700}
+        .badge.ge-b-f{background:#fce4ec;color:#c2185b}
+        .badge.ge-b-m{background:#e3f2fd;color:#1565c0}
+        .badge.ge-b-x{background:#fff1dc;color:#9a5b00}
+        .ge-ojo{border:1.5px solid var(--teal2);background:#fff;color:var(--teal2);border-radius:20px;padding:.1rem .6rem;font-family:inherit;font-size:.68rem;font-weight:800;cursor:pointer}
+        .ge-ojo:active{background:var(--teal2);color:#fff}
+        .ge-ojo.ge-corregir{border-color:#c77700;color:#9a5b00;background:#fff8ec}
+        .ge-ojo.ge-corregir:active{background:#c77700;color:#fff}
+        #modal-ge-vincular{display:none;position:fixed;inset:0;background:rgba(6,42,30,.55);z-index:10002;align-items:center;justify-content:center;padding:1rem}
+        #modal-ge-vincular.show{display:flex}
+        #modal-ge-vincular .mcat-box{max-height:92vh;display:flex;flex-direction:column}
+        #modal-ge-vincular .mcat-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+        .ge-vinc-fila{display:flex;align-items:center;gap:.5rem;padding:.55rem .65rem;border-bottom:1px solid var(--light2)}
+        .ge-vinc-fila:last-child{border-bottom:none}
+        .ge-vinc-fila.sug{background:#e8f8f4}
+        .ge-vinc-info{flex:1;min-width:0}
+        .ge-vinc-nombre{font-weight:800;font-size:.84rem;color:var(--navy2);overflow-wrap:anywhere}
+        .ge-vinc-meta{font-size:.7rem;color:var(--muted);margin-top:1px}
+        .ge-vinc-btn{flex-shrink:0;border:none;background:var(--teal2);color:#fff;border-radius:8px;padding:.4rem .7rem;font-family:inherit;font-size:.74rem;font-weight:800;cursor:pointer}
+        .ge-fechas{margin-top:.55rem;padding:.5rem .65rem;background:var(--light);border:1px solid var(--border);border-radius:9px}
+        .ge-fechas-t{font-size:.7rem;font-weight:800;color:var(--navy);margin-bottom:.3rem}
+        .ge-fecha-fila{font-size:.78rem;color:var(--navy2);padding:.18rem 0;border-top:1px solid var(--light2)}
+        .ge-fecha-fila:first-of-type{border-top:none}
+        .ge-fecha-n{display:inline-block;min-width:1.3rem;text-align:right;color:var(--muted);font-weight:700;margin-right:.2rem}
         #modal-grafica-nutri .modal-box{max-width:520px;transition:max-width .15s,width .15s}
         #modal-grafica-nutri h3{padding-right:80px;word-wrap:break-word;overflow-wrap:break-word}
         .btn-fullscreen-grafica{
@@ -458,6 +501,12 @@
         .btn-magic:active{transform:translateY(2px);box-shadow:0 0 0 #1e3a8a,0 2px 4px rgba(30,58,138,.2);}
         .btn-magic:disabled{filter:grayscale(.4) brightness(.9);cursor:not-allowed;transform:none;}
         .btn-magic-hint{display:none;font-size:.68rem;color:var(--muted);text-align:center;margin:-.15rem 0 .5rem;}
+        /* Selector de estilo de redacción (Técnico / Sencillo) */
+        .estilo-ia-seg{display:flex;gap:0;border:1.5px solid #1e3a8a;border-radius:10px;overflow:hidden;background:#fff;}
+        .estilo-ia-seg button{flex:1;padding:.55rem .4rem;border:none;background:transparent;color:#1e3a8a;
+          font-family:inherit;font-size:.74rem;font-weight:700;cursor:pointer;line-height:1.2;transition:background .15s,color .15s;}
+        .estilo-ia-seg button + button{border-left:1.5px solid #1e3a8a;}
+        .estilo-ia-seg button.activo{background:#1e3a8a;color:#fff;}
 
         /* ══════════════ BOTÓN INFORME MINSAL (visita domiciliar) ══════════════ */
         .btn-informe-minsal{
@@ -752,6 +801,38 @@
         #micat-prev-tbody tr:hover{background:var(--light2)}
         #micat-prev-tbody td{padding:.32rem .6rem;border-bottom:1px solid var(--light2);color:var(--text)}
         #micat-prev-tbody td.err{color:var(--danger);font-style:italic}
+
+        /* ─── Importar catálogo desde el Mapa Sanitario (completa también el sexo) ─── */
+        #modal-mapa-import{
+          display:none;position:fixed;inset:0;background:rgba(6,42,30,.55);
+          z-index:10001;align-items:center;justify-content:center;padding:1rem;
+        }
+        #modal-mapa-import.show{display:flex}
+        #modal-mapa-import .mcat-box{max-height:94vh;display:flex;flex-direction:column}
+        #modal-mapa-import .mcat-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+        .rm-sub{font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:.65rem}
+        .rm-tools{display:flex;flex-wrap:wrap;gap:.4rem .7rem;align-items:center;margin-bottom:.55rem}
+        .rm-tools input[type=search]{flex:1 1 100%;border:1.5px solid var(--border);border-radius:8px;padding:.45rem .65rem;font-family:inherit;font-size:.85rem;min-width:0}
+        .rm-link{background:none;border:none;color:var(--teal);font-weight:800;font-size:.78rem;font-family:inherit;cursor:pointer;padding:.2rem .1rem}
+        .rm-list{max-height:40vh;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:10px;min-height:100px}
+        .rm-row{display:flex;gap:.5rem;align-items:flex-start;padding:.55rem .65rem;border-bottom:1px solid var(--light2)}
+        .rm-row:last-child{border-bottom:none}
+        .rm-row.dis{opacity:.6}
+        .rm-n{flex-shrink:0;min-width:1.6rem;text-align:right;font-size:.7rem;font-weight:700;color:var(--muted);padding-top:3px}
+        .rm-row input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--teal2);flex-shrink:0}
+        .rm-main{flex:1;min-width:0}
+        .rm-name{font-weight:800;font-size:.85rem;color:var(--navy2);overflow-wrap:anywhere}
+        .rm-meta{font-size:.72rem;color:var(--muted);margin-top:1px}
+        .rm-badges{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:.28rem}
+        .rm-b{font-size:.62rem;font-weight:800;padding:1px 7px;border-radius:10px;background:#eceff4;color:#3b4560}
+        .rm-b.ok{background:#dcfce7;color:#166534}
+        .rm-b.warn{background:#fff1dc;color:#9a5b00}
+        .rm-b.no{background:#fde7e5;color:#a12a20}
+        .rm-foot{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:.75rem;flex-wrap:wrap}
+        .rm-count{font-size:.76rem;color:var(--muted)}
+        .rm-empty{padding:1.1rem .9rem;font-size:.84rem;color:var(--muted);line-height:1.55}
+        .rm-map-btn{display:flex;align-items:center;justify-content:center;gap:.45rem;width:100%;padding:.7rem .9rem;margin-bottom:.5rem;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+        .rm-map-btn:active{transform:scale(.98)}
 
         /* ══ BOTÓN SELECTOR PACIENTE (encabezado formulario) ══ */
         .sel-pac-btn{
@@ -1228,7 +1309,7 @@
       <button id="pwaBtnInstalar" type="button">Instalar</button>
       <button id="pwaBtnCerrar" type="button" aria-label="Cerrar">✕</button>
     </div>
-    <script>
+    <script type="text/x-deferred">
     (function(){
       var eventoDiferido = null;
       var banner = document.getElementById('pwaInstallBanner');
@@ -1404,6 +1485,17 @@
             <div class="menu-btn-text">
                 <div class="mbt">Control de Entregas</div>
                 <div class="mbs">Referencias e Informes — por día o mes</div>
+            </div>
+            <div class="menu-btn-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </button>
+
+        <button class="menu-btn" onclick="irA('screen-grupos-etarios')">
+            <div class="menu-btn-icon" style="background:#0b6e8a">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-5.8 6.5-5.8s6.5 2.2 6.5 5.8"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14.2c2.4 0 4 1.6 4 4.3"/></svg>
+            </div>
+            <div class="menu-btn-text">
+                <div class="mbt">Grupos Etarios</div>
+                <div class="mbs">Adolescentes, MEF y adultos — día, mes o año</div>
             </div>
             <div class="menu-btn-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
         </button>
@@ -1616,6 +1708,13 @@
                                 <option value="detallado">🔍 Extenso / Detallado</option>
                             </select>
                         </div>
+                        <div class="f-group" style="margin-bottom:.5rem">
+                            <label>🗣️ Estilo de Redacción</label>
+                            <div class="estilo-ia-seg">
+                                <button type="button" data-estilo="tecnico" onclick="rdpsSetEstiloIA('tecnico')">🩺 Técnico profesional</button>
+                                <button type="button" data-estilo="sencillo" onclick="rdpsSetEstiloIA('sencillo')">🏘️ Técnico comunitario</button>
+                            </div>
+                        </div>
                         <button type="button" class="btn-magic" id="btn-magic-ia" onclick="generarConIA()">
                             <span id="btn-magic-ia-texto">✨ Generar Informe Profesional (Hallazgos y Acciones)</span>
                         </button>
@@ -1650,6 +1749,9 @@
                 <button class="btn save" style="flex:1" onclick="guardarRegistro()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                     Guardar registro
+                </button>
+                <button class="btn secondary" type="button" title="Convierte a MAYÚSCULAS lo escrito en esta ficha" onclick="convertirFichaMayusculas()">
+                    <span style="font-weight:800">🔠</span> Mayúsculas
                 </button>
                 <button class="btn secondary" onclick="limpiarFormulario()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1714,6 +1816,13 @@
             <div id="mcat-fields-persona" style="display:none">
                 <label class="mcat-label">Nombre completo</label>
                 <input class="mcat-input" id="mcat-nombre" placeholder="Nombre de la persona"/>
+
+                <label class="mcat-label">Sexo</label>
+                <select class="mcat-input" id="mcat-sexo" style="margin-bottom:.6rem">
+                    <option value="">Sin indicar</option>
+                    <option value="F">♀ Femenino</option>
+                    <option value="M">♂ Masculino</option>
+                </select>
 
                 <label class="mcat-label">Fecha de nacimiento</label>
                 <input class="mcat-input" type="date" id="mcat-fnac"
@@ -1789,6 +1898,13 @@
     <input type="hidden" id="mep-per-id"/>
     <label class="mcat-label">Nombre completo</label>
     <input class="mcat-input" id="mep-nombre" placeholder="Nombre de la persona" autocomplete="off"/>
+
+                <label class="mcat-label">Sexo</label>
+                <select class="mcat-input" id="mep-sexo" style="margin-bottom:.6rem">
+                    <option value="">Sin indicar</option>
+                    <option value="F">♀ Femenino</option>
+                    <option value="M">♂ Masculino</option>
+                </select>
     <label class="mcat-label">Fecha de nacimiento</label>
     <input class="mcat-input" type="date" id="mep-fnac" oninput="mepCalcularEdad()"/>
     <div id="mep-edad-display" style="display:none;background:linear-gradient(135deg,#0b8a7218,#00b89c12);
@@ -1834,6 +1950,49 @@
   </div>
 </div>
 
+<!-- Modal: vincular el nombre de un registro con un integrante del catálogo (Grupos Etarios) -->
+<div id="modal-ge-vincular" onclick="if(event.target===this)_geCerrarVincular()">
+    <div class="mcat-box" style="max-width:480px" onclick="event.stopPropagation()">
+        <div class="mcat-header">
+            <h4>🔗 Vincular nombre</h4>
+            <button class="mcat-close" onclick="_geCerrarVincular()">✕</button>
+        </div>
+        <div class="mcat-body">
+            <p class="rm-sub" id="ge-vinc-sub"></p>
+            <div class="rm-list" id="ge-vinc-lista"></div>
+            <div class="mcat-btns" style="margin-top:.75rem">
+                <button class="cancel" onclick="_geCerrarVincular()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal importar catálogo desde el Mapa Sanitario (trae también el sexo) -->
+<div id="modal-mapa-import" onclick="if(event.target===this)rmCerrar()">
+    <div class="mcat-box" style="max-width:520px" onclick="event.stopPropagation()">
+        <div class="mcat-header">
+            <h4>🗺️ Importar del Mapa Sanitario</h4>
+            <button class="mcat-close" onclick="rmCerrar()">✕</button>
+        </div>
+        <div class="mcat-body">
+            <p class="rm-sub" id="rm-sub"></p>
+            <div class="rm-tools" id="rm-tools">
+                <input type="search" id="rm-buscar" placeholder="Buscar por nombre o vivienda…" oninput="rmFiltrar()">
+                <button type="button" class="rm-link" onclick="rmMarcar('todas')">Marcar todas</button>
+                <button type="button" class="rm-link" onclick="rmMarcar('ninguna')">Ninguna</button>
+            </div>
+            <div class="rm-list" id="rm-list"></div>
+            <div class="rm-foot">
+                <span class="rm-count" id="rm-count"></span>
+                <div class="mcat-btns" style="margin-left:auto;margin-top:0">
+                    <button class="cancel" onclick="rmCerrar()">Cerrar</button>
+                    <button class="ok" id="rm-go" onclick="rmImportar()">Importar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal importar catálogo desde Excel / CSV / Google Sheets -->
 <div id="modal-importar-cat">
     <div class="mcat-box" style="max-width:480px">
@@ -1845,22 +2004,27 @@
 
             <!-- Paso 1: instrucciones + zona de carga -->
             <div id="micat-paso1" style="padding:1rem">
+                <button type="button" class="rm-map-btn" onclick="cerrarModalImportarCat();rmAbrir()">🗺️ Importar del Mapa Sanitario <span style="font-weight:400;font-size:.72rem;opacity:.85">(incluye el sexo)</span></button>
+                <div style="text-align:center;font-size:.72rem;color:var(--muted);margin:.1rem 0 .75rem">— o desde un archivo Excel / CSV —</div>
                 <div style="background:var(--light);border:1.5px solid var(--border);border-radius:9px;padding:.75rem .9rem;margin-bottom:.85rem;font-size:.78rem;color:var(--navy2)">
                     <strong style="display:block;margin-bottom:.35rem">📋 Formato esperado</strong>
-                    El archivo debe tener <strong>3 columnas</strong> con estos encabezados
+                    El archivo puede tener hasta <strong>5 columnas</strong>, con el <strong>mismo formato del Mapa Sanitario</strong> (el mismo Excel sirve en las dos apps):
                     (en cualquier idioma, el orden sí importa):
                     <div style="margin:.5rem 0;display:flex;gap:.4rem;flex-wrap:wrap">
                         <span style="background:var(--navy2);color:#fff;border-radius:5px;padding:.18rem .55rem;font-size:.72rem;font-weight:700">Columna A — N° Vivienda</span>
                         <span style="background:var(--navy2);color:#fff;border-radius:5px;padding:.18rem .55rem;font-size:.72rem;font-weight:700">Columna B — Nombre</span>
                         <span style="background:#0b8a72;color:#fff;border-radius:5px;padding:.18rem .55rem;font-size:.72rem;font-weight:700">Columna C — Fecha de Nacimiento</span>
+                        <span style="background:#6b7280;color:#fff;border-radius:5px;padding:.18rem .55rem;font-size:.72rem;font-weight:700">Columna D — Riesgo (solo Mapa; aquí se ignora)</span>
+                        <span style="background:#7c3aed;color:#fff;border-radius:5px;padding:.18rem .55rem;font-size:.72rem;font-weight:700">Columna E — Sexo (Masculino/Femenino, opcional)</span>
                     </div>
-                    La fecha de nacimiento puede estar en formato <strong>DD/MM/AAAA</strong>,
+                    En <strong>Sexo</strong> escribe <strong>Femenino</strong> o <strong>Masculino</strong> (también sirve F/M, Mujer/Hombre, Niña/Niño). Si la dejas vacía, la persona queda sin sexo. La fecha de nacimiento puede estar en formato <strong>DD/MM/AAAA</strong>,
                     <strong>AAAA-MM-DD</strong> o como fecha de Excel. La edad se calcula
                     automáticamente en tiempo real (zona horaria El Salvador).<br/>
                     Acepta <strong>.xlsx</strong> (Excel), <strong>.xls</strong>, <strong>.csv</strong> y archivos
                     exportados de <strong>Google Sheets</strong> (.csv o .xlsx).
                     La primera fila se trata como encabezado y se omite.
                 </div>
+                <button type="button" onclick="micatDescargarPlantilla()" style="display:block;width:100%;margin:-.35rem 0 .85rem;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--navy2);font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer">📥 Descargar plantilla de ejemplo</button>
 
                 <label id="micat-dropzone" for="micat-file-input"
                     style="display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1894,9 +2058,11 @@
                     <table id="micat-prev-tabla" style="width:100%;border-collapse:collapse;font-size:.76rem">
                         <thead>
                             <tr style="background:var(--navy);color:#fff;position:sticky;top:0">
+                                <th style="padding:.38rem .5rem;text-align:right;font-weight:700">N°</th>
                                 <th style="padding:.38rem .6rem;text-align:left;font-weight:700">Vivienda</th>
                                 <th style="padding:.38rem .6rem;text-align:left;font-weight:700">Nombre</th>
                                 <th style="padding:.38rem .6rem;text-align:left;font-weight:700;background:#0b8a72">F. Nacimiento → Edad calculada</th>
+                            <th style="padding:.38rem .6rem;text-align:left;font-weight:700;background:#7c3aed">Sexo</th>
                             </tr>
                         </thead>
                         <tbody id="micat-prev-tbody"></tbody>
@@ -2126,6 +2292,7 @@
                     <button type="button" class="ctrl-periodo-btn active" id="ctrl-periodo-hoy" onclick="_ctrlCambiarPeriodo('hoy')">Hoy</button>
                     <button type="button" class="ctrl-periodo-btn" id="ctrl-periodo-dia" onclick="_ctrlCambiarPeriodo('dia')">Otra fecha</button>
                     <button type="button" class="ctrl-periodo-btn" id="ctrl-periodo-mes" onclick="_ctrlCambiarPeriodo('mes')">Por mes</button>
+                    <button type="button" class="ctrl-periodo-btn" id="ctrl-periodo-anio" onclick="_ctrlCambiarPeriodo('anio')">Por año</button>
                 </div>
 
                 <div class="rep-fields" id="ctrl-campos-dia" style="display:none">
@@ -2136,7 +2303,7 @@
                 </div>
 
                 <div class="rep-fields" id="ctrl-campos-mes" style="display:none">
-                    <div class="f-group">
+                    <div class="f-group" id="ctrl-grupo-mes">
                         <label>Mes</label>
                         <select id="ctrl-mes" onchange="_ctrlRenderLista()">
                             <option value="01">Enero</option><option value="02">Febrero</option>
@@ -2156,9 +2323,75 @@
         </div>
 
         <div class="ctrl-resumen" id="ctrl-resumen">0 referencias generadas</div>
+        <div class="ge-buscar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="search" id="ctrl-buscar" placeholder="Buscar por nombre o vivienda…" autocomplete="off" oninput="_ctrlBuscarCambio()"/>
+            <button type="button" class="ge-buscar-x" id="ctrl-buscar-x" onclick="_ctrlBuscarLimpiar()" aria-label="Limpiar búsqueda">✕</button>
+        </div>
         <div id="ctrl-lista"></div>
     </div>
 </div><!-- /screen-control-entregas -->
+
+<!-- ════════════════════════════
+     SCREEN: SEGUIMIENTO POR GRUPOS ETARIOS
+════════════════════════════ -->
+<div class="screen" id="screen-grupos-etarios">
+    <div class="topbar">
+        <button class="back-btn" onclick="irA('screen-home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+            Inicio
+        </button>
+        <span class="topbar-title">Grupos Etarios</span>
+    </div>
+
+    <div class="scroller">
+        <div class="rep-card">
+            <div class="rep-card-body">
+                <div class="ctrl-periodo-botones">
+                    <button type="button" class="ctrl-periodo-btn active" id="ge-periodo-hoy" onclick="_geCambiarPeriodo('hoy')">Hoy</button>
+                    <button type="button" class="ctrl-periodo-btn" id="ge-periodo-dia" onclick="_geCambiarPeriodo('dia')">Otra fecha</button>
+                    <button type="button" class="ctrl-periodo-btn" id="ge-periodo-mes" onclick="_geCambiarPeriodo('mes')">Por mes</button>
+                    <button type="button" class="ctrl-periodo-btn" id="ge-periodo-anio" onclick="_geCambiarPeriodo('anio')">Por año</button>
+                </div>
+
+                <div class="rep-fields" id="ge-campos-dia" style="display:none">
+                    <div class="f-group">
+                        <label>Fecha</label>
+                        <input type="date" id="ge-fecha" onchange="_geRender()"/>
+                    </div>
+                </div>
+
+                <div class="rep-fields" id="ge-campos-mes" style="display:none">
+                    <div class="f-group" id="ge-grupo-mes">
+                        <label>Mes</label>
+                        <select id="ge-mes" onchange="_geRender()">
+                            <option value="01">Enero</option><option value="02">Febrero</option>
+                            <option value="03">Marzo</option><option value="04">Abril</option>
+                            <option value="05">Mayo</option><option value="06">Junio</option>
+                            <option value="07">Julio</option><option value="08">Agosto</option>
+                            <option value="09">Septiembre</option><option value="10">Octubre</option>
+                            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label>Año</label>
+                        <input type="number" id="ge-anio" min="2020" max="2235" onchange="_geRender()"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ctrl-resumen" id="ge-resumen">0 personas visitadas</div>
+        <div id="ge-tabla"></div>
+        <div class="ge-lista-titulo" id="ge-lista-titulo"></div>
+        <div class="ge-buscar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="search" id="ge-buscar" placeholder="Buscar por nombre o vivienda…" autocomplete="off" oninput="_geBuscarCambio()"/>
+            <button type="button" class="ge-buscar-x" id="ge-buscar-x" onclick="_geBuscarLimpiar()" aria-label="Limpiar búsqueda">✕</button>
+        </div>
+        <div id="ge-lista"></div>
+    </div>
+</div><!-- /screen-grupos-etarios -->
 
 <!-- ════════════════════════════
      SCREEN: HISTORIAL POR PERSONA
@@ -2211,6 +2444,16 @@
                 <div class="profile-field">
                     <label>Municipio / Distrito</label>
                     <input type="text" id="cfg-municipio" placeholder="Ej: Coatepeque"/>
+                </div>
+                <hr style="margin:1rem 0;border:none;border-top:1px dashed var(--border)"/>
+                <div class="profile-field">
+                    <label style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+                        <span>🔠 Todo en MAYÚSCULAS</span>
+                        <input type="checkbox" id="cfg-mayusculas" onchange="toggleMayusculasGlobal(this.checked)" style="width:auto;accent-color:var(--navy)"/>
+                    </label>
+                    <p style="font-size:.68rem;color:var(--muted);margin-top:.3rem;line-height:1.4">
+                        Al activarlo, el Registro Diario y el Informe de Visita Domiciliar (MINSAL) — al escribir, generar e imprimir/PDF — se guardan y muestran en MAYÚSCULAS, incluyendo lo ya guardado antes. Es una conversión permanente: desactivarlo después solo detiene la conversión de texto nuevo.
+                    </p>
                 </div>
                 <div class="rdps-ia-oculto" id="rdps-ia-seccion-config">
                 <hr style="margin:1rem 0;border:none;border-top:1px dashed var(--border)"/>
@@ -2454,6 +2697,7 @@
                             <th style="padding:6px; text-align:center; font-weight:700;">Peso (kg)</th>
                             <th style="padding:6px; text-align:center; font-weight:700;">Talla (cm)</th>
                             <th style="padding:6px; text-align:center; font-weight:700;">IMC</th>
+                            <th id="thEstadoHistorial" style="padding:6px; text-align:center; font-weight:700;">Estado</th>
                         </tr>
                     </thead>
                     <tbody id="tablaHistorialBody">
@@ -2552,6 +2796,10 @@
     <div class="fullprev-box">
         <div class="fullprev-topbar">
             <h3>Informe de Visita Domiciliar — MINSAL</h3>
+            <button class="fp-print" title="Convierte todo el informe a MAYÚSCULAS" onclick="convertirInformeAMayusculas()">
+                <span style="font-weight:800">🔠</span>
+                Mayús.
+            </button>
             <button class="fp-print" onclick="imprimirInformeVisitaMINSAL()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 Imprimir
@@ -2566,6 +2814,10 @@
     <div class="fullprev-box">
         <div class="fullprev-topbar">
             <h3>Referencia Comunitaria — MINSAL</h3>
+            <button class="fp-print" title="Convierte toda la referencia a MAYÚSCULAS" onclick="convertirReferenciaAMayusculas()">
+                <span style="font-weight:800">🔠</span>
+                Mayús.
+            </button>
             <button class="fp-print" onclick="imprimirReferenciaMINSAL()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 Imprimir
@@ -2601,7 +2853,7 @@
 <!-- ════════════════════════════════════════════
      JAVASCRIPT
 ════════════════════════════════════════════ -->
-<script>
+<script type="text/x-deferred">
     // ── Firebase: carga dinámica solo cuando se necesita (subirNube / bajarNube) ──
     // Las funciones initializeApp, getFirestore, etc. se inyectan en window al cargar
     var initializeApp, getFirestore, doc, setDoc, getDoc, collection, getDocs, writeBatch, deleteDoc;
@@ -2628,7 +2880,95 @@
     }
 
     let registros = JSON.parse(localStorage.getItem('rdps_registros') || '[]');
+
+    // ══════════════ PUENTE → CURVAS DE CRECIMIENTO ══════════════
+    // Cada vez que se guardan los registros, se publica en 'rdps_curvas_cola' la lista de
+    // visitas que traen PESO (y TALLA si se tomó) detectados en Hallazgos. La app Curvas de
+    // Crecimiento (mismo almacenamiento) lee esa cola, busca a la persona por nombre y crea /
+    // actualiza / elimina la medición sola. Es "best effort": nunca bloquea el guardado local.
+    function _rdpsGuardarRegistrosLS() {
+      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      clearTimeout(_rdpsGuardarRegistrosLS._t);
+      _rdpsGuardarRegistrosLS._t = setTimeout(_curvasPublicarCola, 400);
+    }
+    function _curvasPublicarCola() {
+      try {
+        if (typeof _riesgoParsearNota !== 'function') return;
+        const items = [];
+        (registros || []).forEach(r => {
+          if (!r || !r.id || !r.nombre || !r.fecha) return;
+          const d = _riesgoParsearNota(r.hallazgos || '', r.nombre || '');
+          let peso = d.pesoKg != null ? d.pesoKg : null;
+          let talla = d.tallaCm != null ? d.tallaCm : null;
+          if (peso != null && (peso < 0.5 || peso > 300)) peso = null;
+          if (talla != null && (talla < 25 || talla > 250)) talla = null;
+          if (peso == null) return; // sin peso no se crea medición (igual que el formulario de Curvas)
+          items.push({
+            regId: String(r.id), nombre: r.nombre, vivienda: r.vivienda || '',
+            fecha: r.fecha, pesoKg: peso, tallaCm: talla, edad: r.edad || '', sexo: d.sexo || ''
+          });
+        });
+        localStorage.setItem('rdps_curvas_cola', JSON.stringify({ ts: Date.now(), totalRegistros: (registros || []).length, items }));
+      } catch (e) { console.warn('Puente Curvas:', e); }
+    }
     let perfil    = JSON.parse(localStorage.getItem('rdps_perfil')    || '{}');
+    setTimeout(function () { try { _curvasPublicarCola(); } catch (e) {} }, 1500);
+
+    // ══════════════ MAYÚSCULAS GLOBALES ══════════════
+    // Interruptor guardado en "Mi Perfil" (rdps_mayusculas_activo: '1' = activo).
+    // Cuando está activo: (1) todo texto nuevo que se guarde (Registro Diario e
+    // Informe de Visita Domiciliar MINSAL) se convierte a MAYÚSCULAS antes de guardarse
+    // e imprimirse; (2) al activarlo, TODOS los registros ya guardados se convierten
+    // de una sola vez (acción irreversible: apagar el interruptor después no revierte
+    // lo ya convertido, solo detiene la conversión de texto nuevo).
+    function rdpsMayusculasActivo() {
+      return localStorage.getItem('rdps_mayusculas_activo') === '1';
+    }
+    function _rdpsMay(texto) {
+      if (texto === null || texto === undefined) return texto;
+      return rdpsMayusculasActivo() ? String(texto).toUpperCase() : String(texto);
+    }
+    // Convierte a mayúsculas todos los campos de texto de los registros ya guardados
+    // (Registro Diario) y de sus fichas MINSAL ya generadas (informeCampos), y también
+    // los datos del perfil del promotor. Se usa al activar el interruptor.
+    function _rdpsConvertirTodoAMayusculas() {
+      registros.forEach(r => {
+        ['vivienda','nombre','edad','hallazgos','acciones'].forEach(campo => {
+          if (r[campo]) r[campo] = String(r[campo]).toUpperCase();
+        });
+        if (r.informeCampos) {
+          ['expediente','horaFin','fechaSeguimiento','objetivo','firmaUsuarioNombre',
+           'firmaPersonalNombre','hallazgos','acciones','acuerdo','establecimiento',
+           'fechaMostrar','horaInicio','nombreVivienda'].forEach(campo => {
+            if (r.informeCampos[campo]) r.informeCampos[campo] = String(r.informeCampos[campo]).toUpperCase();
+          });
+        }
+      });
+      _rdpsGuardarRegistrosLS();
+
+      if (perfil.comunidad)       perfil.comunidad       = String(perfil.comunidad).toUpperCase();
+      if (perfil.establecimiento) perfil.establecimiento = String(perfil.establecimiento).toUpperCase();
+      if (perfil.municipio)       perfil.municipio       = String(perfil.municipio).toUpperCase();
+      // perfil.nombre ya se guarda siempre en mayúsculas, sin importar este interruptor.
+      localStorage.setItem('rdps_perfil', JSON.stringify(perfil));
+    }
+    function toggleMayusculasGlobal(activar) {
+      if (activar) {
+        const ok = confirm('Esto convertirá a MAYÚSCULAS todos los registros ya guardados (Registro Diario e Informes MINSAL) y no se puede deshacer. ¿Deseas continuar?');
+        if (!ok) {
+          document.getElementById('cfg-mayusculas').checked = false;
+          return;
+        }
+        localStorage.setItem('rdps_mayusculas_activo', '1');
+        _rdpsConvertirTodoAMayusculas();
+        actualizarHome();
+        renderListado();
+        toast('✅ Todo el texto se convirtió a MAYÚSCULAS', 'success');
+      } else {
+        localStorage.setItem('rdps_mayusculas_activo', '0');
+        toast('Se detuvo la conversión a MAYÚSCULAS para el texto nuevo (lo ya convertido no cambia)', 'success');
+      }
+    }
     let _editId   = null;
     let _modoEdicionListado = false; // true solo si se llegó a la pantalla vía "Editar" desde el listado
     let _previewHTML = '';
@@ -2758,6 +3098,15 @@
         ? informeIframe.contentDocument.getElementById('inf-btn-regen-objetivo')
         : null;
       if (regenBtn) regenBtn.style.display = visible ? '' : 'none';
+      const estiloSel = informeIframe && informeIframe.contentDocument
+        ? informeIframe.contentDocument.getElementById('inf-estilo-objetivo')
+        : null;
+      if (estiloSel) estiloSel.style.display = visible ? '' : 'none';
+      const refIframe = document.getElementById('referencia-minsal-iframe');
+      ['ref-btn-ia', 'ref-estilo-fila'].forEach(id => {
+        const el = refIframe && refIframe.contentDocument ? refIframe.contentDocument.getElementById(id) : null;
+        if (el) el.style.display = visible ? '' : 'none';
+      });
     }
 
     // ── NAVEGACIÓN ──
@@ -3048,7 +3397,7 @@
 ${css}
 @page { size: letter; margin: 1.5cm; }
 html, body { margin: 0; padding: 0 !important; background: #fff; }
-.inf-toolbar, .firma-modal-bg, .inf-firma-borrar, .inf-btn-regen-objetivo, .inf-regen-mensaje, .inf-firma-placeholder { display: none !important; }
+.inf-toolbar, .firma-modal-bg, .inf-firma-borrar, .inf-btn-regen-objetivo, .inf-estilo-obj, .inf-regen-mensaje, .inf-firma-placeholder { display: none !important; }
 .inf-tabla-wrap { overflow: visible; }
 .inf-linea, .inf-campo-full, .inf-header-row, .inf-firma-pad-wrap, table.inf-tabla tr { break-inside: avoid; page-break-inside: avoid; }
 .hoja { width: 185.9mm; height: 247mm; overflow: hidden; position: relative; break-after: page; page-break-after: always; }
@@ -3091,6 +3440,7 @@ ${hojas}
       if (screenId === 'screen-list') renderListado();
       if (screenId === 'screen-home') actualizarHome();
       if (screenId === 'screen-control-entregas') _ctrlRenderLista();
+      if (screenId === 'screen-grupos-etarios') _geRender();
       if (screenId === 'screen-historial') _hpRefrescar();
       // Al abrir formulario nuevo (sin edición ni modo otra persona), refrescar fecha/hora actual
       if (screenId === 'screen-nuevo') {
@@ -4941,7 +5291,7 @@ async function _riesgoGuardarHistorialPeso(reg) {
 // Trae el historial completo de una persona desde la nube O desde caché local.
 // Prioridad: Firebase → localStorage (caché) → []
 // Devuelve siempre un array, nunca lanza error.
-async function _riesgoObtenerHistorialPeso(vivienda, nombre) {
+async function _riesgoObtenerHistorialPesoNube(vivienda, nombre) {
   try {
     const docId = _docIdPromotor();
     if (!docId) return _riesgoObtenerHistorialDelCache(vivienda, nombre);
@@ -4972,6 +5322,49 @@ async function _riesgoObtenerHistorialPeso(vivienda, nombre) {
     console.warn('No se pudo cargar el historial de peso desde la nube, intentando caché:', e);
     return _riesgoObtenerHistorialDelCache(vivienda, nombre);
   }
+}
+
+// Arma el historial a partir de los registros guardados en este dispositivo (localStorage).
+// Así aparecen TODAS las mediciones de la persona, aunque nunca se hayan subido a la nube.
+function _riesgoHistorialDesdeRegistrosLocales(vivienda, nombre) {
+  const out = [];
+  try {
+    const clave = _riesgoClaveIdentidad(vivienda, nombre);
+    if (!clave || !Array.isArray(registros)) return out;
+    registros.forEach(function(r) {
+      if (!r || !r.nombre || !r.fecha) return;
+      if (_riesgoClaveIdentidad(r.vivienda, r.nombre) !== clave) return;
+      const d = _riesgoDatosGrafica(r.edad || '', r.hallazgos || '', r.nombre || '');
+      const p = _riesgoParsearNota(r.hallazgos || '', r.nombre || '');
+      if (p.pesoKg == null && p.tallaCm == null) return;
+      out.push({
+        fecha: r.fecha,
+        pesoKg: p.pesoKg != null ? p.pesoKg : null,
+        tallaCm: p.tallaCm != null ? p.tallaCm : null,
+        edadMeses: d ? d.edadMeses : null
+      });
+    });
+  } catch (e) { console.warn('No se pudo armar historial local:', e); }
+  return out;
+}
+
+// Une nube/caché + registros locales (sin duplicar por fecha; el registro local manda).
+async function _riesgoObtenerHistorialPeso(vivienda, nombre) {
+  let nube = [];
+  try { nube = await _riesgoObtenerHistorialPesoNube(vivienda, nombre); } catch (e) { nube = []; }
+  const esEnLinea = nube && nube._esEnLinea === true;
+  const fechaCache = nube && nube._fechaCaché;
+  const porFecha = {};
+  (nube || []).forEach(function(m) { if (m && m.fecha) porFecha[m.fecha] = m; });
+  _riesgoHistorialDesdeRegistrosLocales(vivienda, nombre).forEach(function(m) {
+    const prev = porFecha[m.fecha] || {};
+    porFecha[m.fecha] = Object.assign({}, prev, m, { edadMeses: m.edadMeses != null ? m.edadMeses : prev.edadMeses });
+  });
+  const res = Object.keys(porFecha).map(function(k) { return porFecha[k]; })
+    .sort(function(a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+  res._esEnLinea = esEnLinea;
+  res._fechaCaché = fechaCache;
+  return res;
 }
 
 // Guarda el historial en localStorage para acceso offline
@@ -5333,12 +5726,37 @@ function toggleHistorialTabla() {
   }
 }
 
+// Estado nutricional de UNA medición histórica, según el indicador que se está viendo
+// en la gráfica (Peso/Edad, Talla/Edad, IMC/Edad o IMC adulto).
+function _riesgoEstadoMedicion(m) {
+  try {
+    const datos = _riesgoGraficaDatosActual;
+    if (!datos || !m || m.edadMeses == null) return null;
+    const ind = _riesgoGraficaIndicadorActual || (datos.disponibles[0] && datos.disponibles[0].id);
+    if (ind === 'imcAdulto') {
+      if (m.pesoKg == null || m.tallaCm == null) return null;
+      const imcA = Math.round((m.pesoKg / Math.pow(m.tallaCm / 100, 2)) * 10) / 10;
+      return _riesgoClasificarIMCAdulto(imcA, m.edadMeses);
+    }
+    let valor = null;
+    if (ind === 'pesoEdad') valor = m.pesoKg;
+    else if (ind === 'tallaEdad') valor = m.tallaCm;
+    else if (ind === 'imcEdad' && m.pesoKg != null && m.tallaCm != null) valor = m.pesoKg / Math.pow(m.tallaCm / 100, 2);
+    if (valor == null || !datos.sexo) return null;
+    const info = _riesgoTablaIndicador(ind, m.edadMeses, datos.sexo);
+    if (!info) return null;
+    const lms = _riesgoLMS(info.tabla, info.mesInicio, m.edadMeses);
+    if (!lms) return null;
+    return _riesgoClasificar(_riesgoZ(lms[0], lms[1], lms[2], valor), info.cortes);
+  } catch (e) { return null; }
+}
+
 function _riesgoLlenarTablaHistorial(historial) {
   const tbody = document.getElementById('tablaHistorialBody');
   tbody.innerHTML = '';
   
   if (!Array.isArray(historial) || historial.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="padding:10px; text-align:center; color:var(--muted);">No hay registros históricos disponibles</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:10px; text-align:center; color:var(--muted);">No hay registros históricos disponibles</td></tr>';
     return;
   }
   
@@ -5354,11 +5772,20 @@ function _riesgoLlenarTablaHistorial(historial) {
       indicadorEl.style.color = '#0b8a72';
     } else {
       const fechaCache = fechaCaché ? new Date(fechaCaché).toLocaleDateString('es-SV') : 'desconocida';
-      indicadorEl.innerHTML = `📱 Datos en caché offline (del ${fechaCache})`;
+      indicadorEl.innerHTML = fechaCaché ? `📱 Datos locales + caché (${fechaCache})` : '📱 Datos de este dispositivo';
       indicadorEl.style.color = '#e67e22';
     }
   }
   
+  // Encabezado de la columna: indica con qué indicador se calcula el estado
+  const thEstado = document.getElementById('thEstadoHistorial');
+  if (thEstado) {
+    const dAct = _riesgoGraficaDatosActual;
+    const indAct = _riesgoGraficaIndicadorActual || (dAct && dAct.disponibles[0] && dAct.disponibles[0].id);
+    const itemAct = dAct && dAct.disponibles.find(function(d) { return d.id === indAct; });
+    thEstado.innerHTML = 'Estado' + (itemAct ? '<div style="font-size:10px;font-weight:500;color:var(--muted);">' + itemAct.etiqueta + '</div>' : '');
+  }
+
   historial.forEach(function(registro, index) {
     const fila = document.createElement('tr');
     fila.style.borderBottom = '1px solid var(--border)';
@@ -5371,7 +5798,7 @@ function _riesgoLlenarTablaHistorial(historial) {
       fila.style.background = '';
     });
     
-    const fecha = registro.fecha ? new Date(registro.fecha).toLocaleDateString('es-SV') : '—';
+    const fecha = registro.fecha ? String(registro.fecha).split('-').reverse().join('/') : '—';
     const peso = registro.pesoKg ? registro.pesoKg.toFixed(1) : '—';
     const talla = registro.tallaCm ? registro.tallaCm.toFixed(1) : '—';
     
@@ -5380,6 +5807,10 @@ function _riesgoLlenarTablaHistorial(historial) {
       imc = (Math.round((registro.pesoKg / Math.pow(registro.tallaCm / 100, 2)) * 10) / 10).toFixed(1);
     }
     
+    const estadoCalc = _riesgoEstadoMedicion(registro);
+    const estadoTexto = estadoCalc || '—';
+    const estadoColor = estadoCalc ? _riesgoColorCategoria(estadoCalc).linea : 'var(--muted)';
+
     const edadMeses = registro.edadMeses;
     let edadTexto = '—';
     if (edadMeses != null) {
@@ -5402,6 +5833,7 @@ function _riesgoLlenarTablaHistorial(historial) {
       <td style="padding:6px; text-align:center; font-weight:500;">${peso}</td>
       <td style="padding:6px; text-align:center; font-weight:500;">${talla}</td>
       <td style="padding:6px; text-align:center; font-weight:500; color:var(--teal2);">${imc}</td>
+      <td style="padding:6px; text-align:center; font-weight:600; font-size:11px; color:${estadoColor};">${estadoTexto}</td>
     `;
     
     tbody.appendChild(fila);
@@ -5567,6 +5999,7 @@ function _riesgoActualizarGrafica(indicadorId) {
   const datos = _riesgoGraficaDatosActual;
   if (!datos) return;
   _riesgoGraficaIndicadorActual = indicadorId;
+  if (Array.isArray(datos.historial)) _riesgoLlenarTablaHistorial(datos.historial);
   const item = datos.disponibles.find(function(d) { return d.id === indicadorId; }) || datos.disponibles[0];
   const canvas = document.getElementById('graficaNutriCanvas');
   const resumen = document.getElementById('graficaNutriResumen');
@@ -5751,6 +6184,7 @@ function _riesgoActualizarGrafica(indicadorId) {
       document.getElementById('cfg-comunidad').value       = perfil.comunidad       || '';
       document.getElementById('cfg-establecimiento').value = perfil.establecimiento  || '';
       document.getElementById('cfg-municipio').value       = perfil.municipio        || '';
+      document.getElementById('cfg-mayusculas').checked    = rdpsMayusculasActivo();
 
       const selectProveedor = document.getElementById('cfg-ia-proveedor');
       selectProveedor.innerHTML = Object.keys(RDPS_PROVEEDORES)
@@ -5778,9 +6212,9 @@ function _riesgoActualizarGrafica(indicadorId) {
       const n = document.getElementById('cfg-nombre').value.trim().toUpperCase();
       if (!n) { toast('⚠️ El nombre es obligatorio', 'error'); return; }
       perfil.nombre          = n;
-      perfil.comunidad       = document.getElementById('cfg-comunidad').value.trim();
-      perfil.establecimiento = document.getElementById('cfg-establecimiento').value.trim();
-      perfil.municipio       = document.getElementById('cfg-municipio').value.trim();
+      perfil.comunidad       = _rdpsMay(document.getElementById('cfg-comunidad').value.trim());
+      perfil.establecimiento = _rdpsMay(document.getElementById('cfg-establecimiento').value.trim());
+      perfil.municipio       = _rdpsMay(document.getElementById('cfg-municipio').value.trim());
       localStorage.setItem('rdps_perfil', JSON.stringify(perfil));
 
       const provId = document.getElementById('cfg-ia-proveedor').value;
@@ -5872,6 +6306,26 @@ function _riesgoActualizarGrafica(indicadorId) {
     // Guarda la nota original (idea básica) para que cambiar de nivel (Resumido/Balanceado/Detallado)
     // siempre regenere a partir de la MISMA idea original, y no sobre el texto ya redactado por la IA.
     let _iaNotaBaseOriginal = null;
+
+    // ── Estilo de redacción de la IA: 'tecnico' (formal) o 'sencillo' (lenguaje comunitario) ──
+    // Se recuerda en el dispositivo y lo comparten el formulario de registro y la tabla del reporte.
+    const RDPS_ESTILO_IA_KEY = 'rdps_estilo_ia';
+    function rdpsGetEstiloIA() {
+      try { return localStorage.getItem(RDPS_ESTILO_IA_KEY) === 'sencillo' ? 'sencillo' : 'tecnico'; }
+      catch (e) { return 'tecnico'; }
+    }
+    function rdpsPintarEstiloIA() {
+      const estilo = rdpsGetEstiloIA();
+      document.querySelectorAll('.estilo-ia-seg button').forEach(b => {
+        b.classList.toggle('activo', b.getAttribute('data-estilo') === estilo);
+      });
+    }
+    function rdpsSetEstiloIA(valor) {
+      try { localStorage.setItem(RDPS_ESTILO_IA_KEY, valor === 'sencillo' ? 'sencillo' : 'tecnico'); } catch (e) {}
+      rdpsPintarEstiloIA();
+    }
+    rdpsPintarEstiloIA();
+    document.addEventListener('DOMContentLoaded', rdpsPintarEstiloIA);
     let _iaUltimaSalidaHallazgos = null;
 
     // Listas de aperturas sugeridas (deben coincidir con las que se listan en el prompt) y
@@ -6046,6 +6500,7 @@ function _riesgoActualizarGrafica(indicadorId) {
       const notasAcciones  = document.getElementById(`${prefijo}-acciones`).value.trim();
       const nivelEl = document.getElementById(`${prefijo}-nivel-ia`);
       const nivel  = nivelEl ? nivelEl.value : 'balanceado';
+      const estilo = rdpsGetEstiloIA();
 
       if (!nombre) { toast('⚠️ Ingresa el nombre antes de usar la IA', 'error'); return; }
       if (!campoHallazgosActual) { toast('⚠️ Escribe la idea básica en "Hallazgos" primero', 'error'); return; }
@@ -6083,7 +6538,7 @@ function _riesgoActualizarGrafica(indicadorId) {
       // Si en esta misma sesión ya se generaron redacciones antes, se le pide a la IA
       // que evite repetir las mismas aperturas usadas en la(s) persona(s) anterior(es).
       let refuerzoVariedadSesion = "";
-      if (_iaHistorialAperturas.hallazgos.length || _iaHistorialAperturas.acciones.length) {
+      if (estilo === 'tecnico' && (_iaHistorialAperturas.hallazgos.length || _iaHistorialAperturas.acciones.length)) {
         refuerzoVariedadSesion = `\nEVITA REPETIR APERTURAS YA USADAS EN PERSONAS ANTERIORES DE ESTA MISMA SESIÓN (elige una alternativa distinta a estas):`;
         if (_iaHistorialAperturas.hallazgos.length) {
           refuerzoVariedadSesion += `\n   - Para "Hallazgos en la Visita", NO uses: ${_iaHistorialAperturas.hallazgos.join(', ')}`;
@@ -6116,6 +6571,18 @@ function _riesgoActualizarGrafica(indicadorId) {
         temp = 0.35;
       }
 
+      // Bloque que se agrega al prompt solo cuando se eligió "Técnico comunitario"
+      const reglaEstilo = estilo === 'sencillo' ? `
+ESTILO DE REDACCIÓN: TÉCNICO EN SALUD COMUNITARIA (regla crítica, SUSTITUYE las instrucciones anteriores de "redacción técnica formal", de aperturas técnicas y de vocabulario clínico especializado):
+   - Redacta con el registro profesional de un promotor o técnico de salud comunitaria que documenta su visita: lenguaje claro, preciso y ordenado, comprensible para cualquier persona del equipo de salud o de la comunidad, pero SIN sonar coloquial, infantil ni simplista (no uses diminutivos, expresiones de plática ni frases como "como un vecino").
+   - Usa los términos propios del primer nivel de atención y de la salud comunitaria, que sí son de uso común: hipertensión arterial, diabetes, control prenatal, signos de peligro, esquema de vacunación, lactancia materna, desnutrición, deshidratación, consejería, seguimiento, referencia al establecimiento de salud, usuario/usuaria, vivienda, grupo familiar. Estos NO se simplifican.
+   - Solo reemplaza el vocabulario clínico especializado u hospitalario por su equivalente claro: "sintomatología" → "síntomas"; "cefalea" → "dolor de cabeza"; "disnea" → "dificultad para respirar"; "edema" → "hinchazón"; "hiperglucemia" → "glucosa elevada"; "adherencia al tratamiento" → "cumplimiento del tratamiento"; "cuadro clínico" → "situación de salud"; "evaluación clínica" → "valoración". Si usas un término poco común, aclara brevemente entre paréntesis.
+   - Explica los riesgos de forma directa y entendible (ej. "riesgo de complicaciones", "puede agravarse si no recibe atención").
+   - Aperturas sugeridas en lugar de las técnicas. Para "Hallazgos": "Se identificó que...", "Durante la visita se encontró que...", "Se verificó que...", "Se observó que...", "Al realizar la visita se constató que...". Para "Acciones": "Se brindó consejería sobre...", "Se orientó a la persona sobre...", "Se explicó la importancia de...", "Se reforzó la información sobre...", "Se recomendó...". Varía entre ellas. Para el ACUERDO: "Acuerdo: ...", "Se acordó que...", "La persona se comprometió a...", "Se estableció el compromiso de...".
+   - Pretérito simple y tercera persona; nunca "paciente" ni "el equipo de salud".
+   - Solo cambia el REGISTRO del lenguaje, no el contenido: TODAS las demás reglas siguen vigentes (cifras con su unidad exacta, sexo, peso/talla, cobertura de todos los temas, no inventar nada, no recortar lo ya escrito, acuerdo claro, mismo formato TSV de 4 columnas y mismo formato de edad). Las cifras (ej. 140/90, kg, cm, semanas, fechas) se conservan exactas.
+` : '';
+
       const btn = document.getElementById(prefijo === 'e' ? 'btn-magic-ia-edit' : 'btn-magic-ia');
       const btnTexto = document.getElementById(prefijo === 'e' ? 'btn-magic-ia-edit-texto' : 'btn-magic-ia-texto');
       const textoOriginal = btnTexto.textContent;
@@ -6147,7 +6614,7 @@ ${refuerzoVariedadSesion}
 ${refuerzoRiesgo}
 
 ${reglaDetalle}
-
+${reglaEstilo}
 RAZONAMIENTO LIMITADO A LOS HALLAZGOS (regla crítica, no negociable):
    - La consejería, las "Acciones Ejecutadas" y el acuerdo DEBEN derivarse únicamente de lo que está explícitamente mencionado en las notas/hallazgos. NO inventes diagnósticos, condiciones, antecedentes, exámenes ni intervenciones que el promotor no haya anotado.
    - SÍ está permitido el razonamiento clínico lógico y directo sobre lo que fue mencionado (ej: si la nota dice "con gripe", es válido recomendar reposo, hidratación y observación de signos de alarma, porque es manejo estándar de esa condición ya mencionada).
@@ -6223,9 +6690,11 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
           _autoCrecerTextarea(document.getElementById(`${prefijo}-hallazgos`));
           _autoCrecerTextarea(document.getElementById(`${prefijo}-acciones`));
           _iaUltimaSalidaHallazgos = hallazgosFinal; // Para detectar si el usuario edita manualmente después
-          _iaRegistrarAperturaUsada(_iaHistorialAperturas.hallazgos, _iaDetectarApertura(hallazgosFinal, _iaAperturasHallazgos));
-          _iaRegistrarAperturaUsada(_iaHistorialAperturas.acciones, _iaDetectarApertura(accionesFinal, _iaAperturasAcciones));
-          toast('✨ Redacción generada — revisa antes de guardar', 'success');
+          if (estilo === 'tecnico') {
+            _iaRegistrarAperturaUsada(_iaHistorialAperturas.hallazgos, _iaDetectarApertura(hallazgosFinal, _iaAperturasHallazgos));
+            _iaRegistrarAperturaUsada(_iaHistorialAperturas.acciones, _iaDetectarApertura(accionesFinal, _iaAperturasAcciones));
+          }
+          toast(estilo === 'sencillo' ? '✨ Redacción en estilo técnico comunitario generada — revisa antes de guardar' : '✨ Redacción generada — revisa antes de guardar', 'success');
         } else {
           toast('❌ La IA no devolvió contenido válido. Intenta de nuevo.', 'error');
         }
@@ -6254,11 +6723,11 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
         id:        id || Date.now().toString(),
         fecha,
         hora:      document.getElementById('r-hora').value,
-        vivienda:  document.getElementById('r-vivienda').value.trim(),
-        nombre,
-        edad:      document.getElementById('r-edad').value,
-        hallazgos: document.getElementById('r-hallazgos').value.trim(),
-        acciones:  document.getElementById('r-acciones').value.trim(),
+        vivienda:  _rdpsMay(document.getElementById('r-vivienda').value.trim()),
+        nombre:    _rdpsMay(nombre),
+        edad:      _rdpsMay(document.getElementById('r-edad').value),
+        hallazgos: _rdpsMay(document.getElementById('r-hallazgos').value.trim()),
+        acciones:  _rdpsMay(document.getElementById('r-acciones').value.trim()),
         promotor:  perfil.nombre || '',
         comunidad: perfil.comunidad || '',
         establecimiento: perfil.establecimiento || '',
@@ -6291,9 +6760,10 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
       document.getElementById('edit-id').value = reg.id;
       clearTimeout(_ctrlAutoguardadoTimeout);
 
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       actualizarHome();
       _riesgoGuardarHistorialPeso(reg).catch(() => {});
+      _vmSincronizarNota(registros.find(r => r.id === reg.id) || reg);
 
       if (_modoEdicionListado) {
         // Modo edición (venía del listado, no del flujo de "Nueva Visita"):
@@ -6327,6 +6797,139 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
         }
         document.getElementById('modal-siguiente').classList.add('show');
       }
+    }
+
+    // ── Nota clínica automática en Vigilancia Materna ──────────────────────────
+    // Al guardar una visita, si la persona ya está en Vigilancia Materna (coincidencia EXACTA
+    // de nombre, sin distinguir mayúsculas ni tildes), Hallazgos + Acciones se agregan como UNA
+    // nota clínica (dos párrafos, separados por una línea en blanco) con la fecha del registro.
+    // La etapa (Embarazo / Puerperio) se decide por la FECHA de la visita según los rangos de la
+    // paciente: Embarazo = FUR hasta el día antes del parto/aborto (si sigue embarazada, hasta hoy),
+    // Puerperio = parto hasta 42 días después. Si la fecha no cae en ningún rango, se usa la etapa
+    // de la lista donde está hoy (embarazada/puérpera); las archivadas solo reciben notas dentro de rango.
+    // Es silencioso y no duplica: cada nota guarda el id del registro que la originó (origenRegId),
+    // así que al volver a guardar o editar la visita, la nota se actualiza. Ambas apps comparten
+    // localStorage al estar en el mismo origen; si no, simplemente no hace nada.
+    function _vmNorm(s) {
+      return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+    function _vmSumarDias(iso, dias) {
+      const [y, mo, d] = iso.split('-').map(Number);
+      const dt = new Date(y, mo - 1, d + dias);
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+    function _vmRangos(p, clave) {
+      const iso = v => { const m = String(v || '').match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : null; };
+      const rangos = [];
+      if (clave === 'embarazadas') {
+        const fur = iso(p.fur);
+        if (fur) rangos.push({ etapa: 'Embarazo', ini: fur, fin: null });
+      } else {
+        const fp = iso(p.fp);
+        if (!fp) return rangos;
+        const fur = iso(p.historial_embarazo && p.historial_embarazo.fur);
+        if (fur) rangos.push({ etapa: 'Embarazo', ini: fur, fin: _vmSumarDias(fp, -1) });
+        rangos.push({ etapa: 'Puerperio', ini: fp, fin: _vmSumarDias(fp, 42) });
+      }
+      return rangos;
+    }
+    function _vmEtapaPorFecha(p, clave, fechaISO) {
+      const r = _vmRangos(p, clave).find(r => r.ini <= fechaISO && (r.fin === null || fechaISO <= r.fin));
+      return r ? r.etapa : null;
+    }
+    function _vmSincronizarNota(reg) {
+      try {
+        const claves = ['embarazadas', 'puerperas', 'archivadas'];
+        const etapaLista = { embarazadas: 'Embarazo', puerperas: 'Puerperio', archivadas: null };
+        const listas = {};
+        claves.forEach(k => {
+          let l = null;
+          try { l = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+          listas[k] = Array.isArray(l) ? l : null;
+        });
+        if (!claves.some(k => listas[k])) return;
+
+        const nombre = _vmNorm(reg.nombre);
+        const h = String(reg.hallazgos || '').replace(/\s+/g, ' ').trim();
+        const a = String(reg.acciones  || '').replace(/\s+/g, ' ').trim();
+        // Hallazgos y Acciones separados por una línea en blanco (la nota se muestra con pre-wrap)
+        const texto = [h, a].filter(Boolean).join('\n\n');
+
+        const m = String(reg.fecha || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+        const fechaISO = m ? `${m[1]}-${m[2]}-${m[3]}` : '';
+
+        // Candidatas con ese nombre exacto; la etapa sale de la fecha de la visita
+        let candidatas = [];
+        claves.forEach(k => {
+          if (!listas[k]) return;
+          listas[k].forEach(p => {
+            if (!nombre || _vmNorm(p.nombre) !== nombre) return;
+            const etapaFecha = fechaISO ? _vmEtapaPorFecha(p, k, fechaISO) : null;
+            candidatas.push({ k, p, etapaFecha, etapa: etapaFecha || etapaLista[k] });
+          });
+        });
+        // Archivadas: solo si la fecha cae dentro de un rango suyo
+        candidatas = candidatas.filter(c => c.k !== 'archivadas' || c.etapaFecha);
+
+        // Si hay varias con el mismo nombre, se desempata por el rango que contiene la fecha
+        if (candidatas.length > 1) {
+          const porRango = candidatas.filter(c => c.etapaFecha);
+          if (porRango.length === 1) candidatas = porRango;
+        }
+        // Si sigue habiendo más de una no se adivina: mejor sin nota que en el expediente equivocado.
+        if (texto && candidatas.length > 1) {
+          toast('⚠️ Hay más de una "' + reg.nombre + '" en Vigilancia Materna: no se agregó la nota', 'error');
+        }
+        const destino = (texto && candidatas.length === 1) ? candidatas[0] : null;
+
+        // Fecha del registro (+ su hora, o la hora actual si no tiene)
+        let fechaNota = '';
+        if (m) {
+          let hora = /^\d{2}:\d{2}/.test(reg.hora || '') ? reg.hora.slice(0, 5) : '';
+          if (!hora) {
+            const n = new Date();
+            hora = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+          }
+          fechaNota = `${m[3]}/${m[2]}/${m[1]}, ${hora}`;
+        }
+
+        const cambiadas = new Set();
+
+        // Quita notas de este registro que ya no correspondan (cambió el nombre o se vació el texto)
+        claves.forEach(k => {
+          if (!listas[k]) return;
+          listas[k].forEach(p => {
+            if (!Array.isArray(p.notas)) return;
+            if (destino && p === destino.p) return;
+            const antes = p.notas.length;
+            p.notas = p.notas.filter(n => String(n.origenRegId) !== String(reg.id));
+            if (p.notas.length !== antes) cambiadas.add(k);
+          });
+        });
+
+        if (destino && fechaNota && destino.etapa) {
+          const p = destino.p;
+          if (!Array.isArray(p.notas)) p.notas = [];
+          const existente = p.notas.find(n => String(n.origenRegId) === String(reg.id));
+          if (existente) {
+            existente.fecha = fechaNota;
+            existente.texto = texto;
+            existente.etapa = destino.etapa;
+          } else {
+            p.notas.push({
+              fecha: fechaNota,
+              texto,
+              etapa: destino.etapa,
+              origen: 'registro_diario',
+              origenRegId: String(reg.id)
+            });
+          }
+          cambiadas.add(destino.k);
+        }
+
+        cambiadas.forEach(k => localStorage.setItem(k, JSON.stringify(listas[k])));
+      } catch (e) { console.warn('Nota Vigilancia Materna:', e); }
     }
 
     function guardarYOtraPersona() {
@@ -6367,7 +6970,7 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
         actualizadoEn: new Date().toISOString()
       };
       registros.push(reg);
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       actualizarHome();
       if (idField) idField.value = nuevoId;
       toast('💾 Visita guardada automáticamente', 'success');
@@ -6418,7 +7021,7 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
         registros.push(reg);
         if (idField) idField.value = reg.id;
       }
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
     }
 
     // Debounce corto: espera a que el promotor deje de escribir/cambiar de campo antes de
@@ -6634,13 +7237,16 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
       if (!ul) return;
       ul.classList.remove('open');
       document.getElementById('bop-btn-ver').textContent = 'Ver';
+      document.getElementById('bop-detalle').style.display = '';
     }
 
     function _bopVerListado() {
       const ul = document.getElementById('bop-lista');
-      if (ul.classList.contains('open')) { _bopCerrarLista(); return; }
+      const abrir = !ul.classList.contains('open');
+      if (!abrir) { _bopCerrarLista(); return; }
       ul.classList.add('open');
       document.getElementById('bop-btn-ver').textContent = 'Ocultar';
+      document.getElementById('bop-detalle').style.display = 'none'; // evita repetir los nombres
       _bopRenderLista();
     }
 
@@ -6687,10 +7293,27 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
       }, 50);
     }
 
+    // Convierte a MAYÚSCULAS el contenido ya escrito en la ficha abierta (Nueva Visita o
+    // Editar Visita), sin necesidad de activar el interruptor global de "Mi Perfil".
+    // Es una acción puntual: solo afecta esta ficha, en el momento en que se pulsa el botón.
+    function convertirFichaMayusculas() {
+      const campos = ['r-vivienda', 'r-edad', 'r-nombre', 'r-hallazgos', 'r-acciones'];
+      let huboCambio = false;
+      campos.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value) {
+          const mayus = el.value.toUpperCase();
+          if (el.value !== mayus) { el.value = mayus; huboCambio = true; }
+        }
+      });
+      _actualizarBtnGrafica('r');
+      toast(huboCambio ? '🔠 Ficha convertida a MAYÚSCULAS' : 'No hay texto que convertir todavía');
+    }
+
     function eliminarRegistro(id) {
       if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
       registros = registros.filter(r => r.id !== id);
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       try {
         const del = JSON.parse(localStorage.getItem('rdps_deleted_reg') || '{}');
         del[String(id)] = new Date().toISOString();
@@ -6897,7 +7520,7 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
           if (!confirm(`¿Importar ${data.registros.length} registros?\n\nEsto REEMPLAZARÁ los datos actuales.`)) return;
           registros = data.registros;
           if (data.perfil) perfil = data.perfil;
-          localStorage.setItem('rdps_registros', JSON.stringify(registros));
+          _rdpsGuardarRegistrosLS();
           localStorage.setItem('rdps_perfil', JSON.stringify(perfil));
           actualizarHome();
           renderListado();
@@ -7253,11 +7876,29 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
     // primero es "recién nacido", el objetivo es el recién nacido). El resto de lo
     // encontrado (signos de alarma, otros datos, etc.) queda documentado en la
     // sección 3 (Hallazgos), no se repite aquí.
+    // Aperturas alternativas para el "Objetivo de la visita", usadas tanto por el cálculo
+    // local (sin IA) como para orientar a la IA, de modo que el informe no siempre empiece
+    // con la misma frase. Todas mantienen el mismo sentido (visita domiciliaria de seguimiento).
+    const _infAperturasObjetivo = [
+      'Realizar visita domiciliaria de seguimiento con el fin de',
+      'Efectuar visita domiciliar de control con el propósito de',
+      'Llevar a cabo una visita domiciliaria de seguimiento para',
+      'Realizar visita de seguimiento en el hogar con el objetivo de',
+      'Ejecutar visita domiciliar con el fin de',
+      'Dar seguimiento mediante visita domiciliaria con el propósito de',
+      'Brindar seguimiento domiciliar con el fin de',
+      'Realizar visita de control en el domicilio con el objetivo de'
+    ];
+
+    function _infAperturaAleatoria() {
+      return _infAperturasObjetivo[Math.floor(Math.random() * _infAperturasObjetivo.length)];
+    }
+
     function _infCalcularObjetivo(hallazgos, acciones, dv) {
       const motivo = _infDetectarMotivoPrincipal(hallazgos)
                   || _infDetectarMotivoPrincipal(acciones)
                   || 'verificar el estado de salud general de la persona y brindar la consejería correspondiente';
-      return `Realizar visita domiciliaria de seguimiento con el fin de ${motivo}.`;
+      return `${_infAperturaAleatoria()} ${motivo}.`;
     }
 
     // Genera el "Objetivo de la visita" con el mismo motor de IA (Groq/Gemini/OpenRouter)
@@ -7266,7 +7907,8 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
     // Si no hay clave API configurada, o la IA falla/no hay internet, devuelve null y quien
     // llama esta función debe usar _infCalcularObjetivo() como respaldo — el informe nunca
     // debe quedar bloqueado por falta de conexión.
-    async function _infGenerarObjetivoIA(nombre, hallazgos, acciones) {
+    async function _infGenerarObjetivoIA(nombre, hallazgos, acciones, estiloParam) {
+      const estilo = (estiloParam === 'sencillo' || estiloParam === 'tecnico') ? estiloParam : rdpsGetEstiloIA();
       const proveedorId = rdpsProveedorActual();
       const proveedor = RDPS_PROVEEDORES[proveedorId];
       const apiKey = localStorage.getItem(proveedor.keyStorage);
@@ -7279,18 +7921,32 @@ Nombre: ${nombre || 'No especificado'} | Edad: ${edad || 'No especificada'} | No
 
       const modeloIA = localStorage.getItem(proveedor.modeloStorage) || proveedor.modeloDefault;
 
+      // Se sugiere una apertura distinta en cada llamada (elegida al azar) para que el
+      // objetivo generado no siempre comience con la misma frase, aunque el motivo sea similar.
+      const _aperturasObjetivoSencillo = [
+        'Realizar visita domiciliar para dar seguimiento a', 'Visitar el hogar con el fin de', 'Brindar consejería en el hogar sobre',
+        'Dar seguimiento en la vivienda a', 'Verificar en el hogar', 'Visitar a la familia para'
+      ];
+      const aperturaSugerida = estilo === 'sencillo'
+        ? _aperturasObjetivoSencillo[Math.floor(Math.random() * _aperturasObjetivoSencillo.length)]
+        : _infAperturaAleatoria();
+      const reglaApertura = estilo === 'sencillo'
+        ? `2. ESTILO: TÉCNICO EN SALUD COMUNITARIA. Redacta con el registro profesional de un promotor o técnico de salud comunitaria: lenguaje claro y directo, sin sonar coloquial ni infantil. Usa los términos propios del primer nivel de atención (hipertensión arterial, diabetes, control prenatal, signos de peligro, consejería, seguimiento, referencia) y solo reemplaza el vocabulario clínico especializado por su equivalente claro (ej. "síntomas" en vez de "sintomatología", "dificultad para respirar" en vez de "disnea"). Para esta ocasión inicia con esta apertura o una variación natural muy cercana: "${aperturaSugerida}...". Varía el inicio entre informes.`
+        : `2. Para esta ocasión, inicia el texto con esta apertura exacta o una variación natural muy cercana en redacción: "${aperturaSugerida}...". NO uses "Realizar visita domiciliaria de seguimiento con el fin de" salvo que sea justo la apertura indicada aquí — el objetivo es variar el inicio entre informes, nunca repetir siempre la misma frase.`;
+
       const prompt = `
 Eres un asistente para promotores de salud comunitaria en El Salvador (formato oficial MINSAL de informe de visita domiciliar).
 
 Con base ÚNICAMENTE en los "Hallazgos" y las "Acciones ejecutadas" de una visita YA REALIZADA (redactados abajo), escribe el "Objetivo de la visita" que debió plantearse antes de iniciarla.
 
 REGLAS (no negociables):
-1. Debe tener entre 2 y 3 oraciones (aproximadamente 35 a 60 palabras en total) — ni una sola frase telegráfica ni un párrafo largo. Inicia con "Realizar visita domiciliaria de seguimiento con el fin de..." o una construcción equivalente.
-2. Incluye datos CONCRETOS que ya aparezcan en los Hallazgos/Acciones y ayuden a entender el propósito de la visita: por ejemplo la edad o etapa de vida de la persona (recién nacido, embarazo de X semanas, adulto mayor, etc.), la condición o motivo principal, y si aplica, qué se buscaba verificar o reforzar (signos de alarma, signos vitales, cumplimiento de un acuerdo o control anterior). No agregues cifras o datos que no estén ya en el texto proporcionado.
-3. NO inventes ningún diagnóstico, dato, antecedente o acción que no esté explícita o implícitamente contenido en los Hallazgos/Acciones proporcionados. El objetivo debe quedarse estrictamente dentro de ese contexto.
-4. Si hay más de un tema/condición relevante, prioriza el motivo PRINCIPAL de la visita y menciona un segundo tema solo si es claramente relevante; no intentes listar todos los temas menores.
-5. No copies literalmente frases completas de los Hallazgos; sintetiza y contextualiza el propósito de la visita, no te limites a repetir el resultado encontrado.
-6. Responde ÚNICAMENTE con el texto del objetivo, en un solo párrafo (sin saltos de línea), sin comillas, sin explicaciones, sin markdown ni texto adicional antes o después.
+1. Debe tener entre 2 y 3 oraciones (aproximadamente 35 a 60 palabras en total) — ni una sola frase telegráfica ni un párrafo largo.
+${reglaApertura}
+3. Incluye datos CONCRETOS que ya aparezcan en los Hallazgos/Acciones y ayuden a entender el propósito de la visita: por ejemplo la edad o etapa de vida de la persona (recién nacido, embarazo de X semanas, adulto mayor, etc.), la condición o motivo principal, y si aplica, qué se buscaba verificar o reforzar (signos de alarma, signos vitales, cumplimiento de un acuerdo o control anterior). No agregues cifras o datos que no estén ya en el texto proporcionado.
+4. NO inventes ningún diagnóstico, dato, antecedente o acción que no esté explícita o implícitamente contenido en los Hallazgos/Acciones proporcionados. El objetivo debe quedarse estrictamente dentro de ese contexto.
+5. Si hay más de un tema/condición relevante, prioriza el motivo PRINCIPAL de la visita y menciona un segundo tema solo si es claramente relevante; no intentes listar todos los temas menores.
+6. No copies literalmente frases completas de los Hallazgos; sintetiza y contextualiza el propósito de la visita, no te limites a repetir el resultado encontrado.
+7. Responde ÚNICAMENTE con el texto del objetivo, en un solo párrafo (sin saltos de línea), sin comillas, sin explicaciones, sin markdown ni texto adicional antes o después.
 
 Persona: ${nombre || 'No especificada'}
 Hallazgos de la visita: ${hallazgos || '—'}
@@ -7298,7 +7954,7 @@ Acciones ejecutadas: ${acciones || '—'}
       `;
 
       try {
-        const peticion = _rdpsConstruirPeticion(proveedorId, modeloIA, apiKey, prompt, 0.35);
+        const peticion = _rdpsConstruirPeticion(proveedorId, modeloIA, apiKey, prompt, 0.6);
         // Solo 1 intento y espera corta (8s): esto es un "extra" sobre un informe que ya
         // funciona sin IA — si la señal está débil o no hay internet, se prefiere continuar
         // de inmediato con el objetivo calculado localmente antes que dejar al promotor esperando.
@@ -7345,7 +8001,7 @@ Acciones ejecutadas: ${acciones || '—'}
       registros[idx].informeCampos[campo] = valor;
       if (huella) registros[idx].informeCampos._huella = huella;
       registros[idx].actualizadoEn = new Date().toISOString();
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       return true;
     }
 
@@ -7357,20 +8013,20 @@ Acciones ejecutadas: ${acciones || '—'}
       if (campoId === 'firma-usuario') registros[idx].firmas.usuario = dataURLOrNull;
       else if (campoId === 'firma-personal') registros[idx].firmas.personal = dataURLOrNull;
       registros[idx].actualizadoEn = new Date().toISOString();
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       return true;
     }
 
     async function abrirInformeVisitaMINSAL(prefijo) {
       const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
 
-      const nombre    = g(`${prefijo}-nombre`);
+      const nombre    = _rdpsMay(g(`${prefijo}-nombre`));
       const fecha     = g(`${prefijo}-fecha`);
       const hora      = g(`${prefijo}-hora`);
-      const edad      = g(`${prefijo}-edad`);
-      const vivienda  = g(`${prefijo}-vivienda`);
-      const hallazgos = g(`${prefijo}-hallazgos`);
-      const acciones  = g(`${prefijo}-acciones`);
+      const edad      = _rdpsMay(g(`${prefijo}-edad`));
+      const vivienda  = _rdpsMay(g(`${prefijo}-vivienda`));
+      const hallazgos = _rdpsMay(g(`${prefijo}-hallazgos`));
+      const acciones  = _rdpsMay(g(`${prefijo}-acciones`));
 
       if (!nombre) { toast('⚠️ Escribe el nombre del usuario antes de generar el informe', 'error'); return; }
 
@@ -7458,6 +8114,18 @@ Acciones ejecutadas: ${acciones || '—'}
       _informeVisitaMinsalHTML = htmlInformeVisitaMINSAL(datos);
       document.getElementById('informe-minsal-iframe').srcdoc = _informeVisitaMinsalHTML;
       document.getElementById('modal-informe-minsal').classList.add('show');
+    }
+
+    // Convierte a MAYÚSCULAS todo el contenido editable del informe MINSAL que está
+    // actualmente abierto (encabezado, signos vitales, hallazgos, acciones, acuerdo,
+    // firmas, etc.) y guarda cada campo convertido, igual que si se hubiera editado a mano.
+    function convertirInformeAMayusculas() {
+      const iframe = document.getElementById('informe-minsal-iframe');
+      const win = iframe && iframe.contentWindow;
+      if (win && typeof win._infConvertirTodoMayusculas === 'function') {
+        win._infConvertirTodoMayusculas();
+        toast('🔠 Informe convertido a MAYÚSCULAS');
+      }
     }
 
     function cerrarInformeVisitaMINSAL() {
@@ -7573,6 +8241,7 @@ Acciones ejecutadas: ${acciones || '—'}
   .fm-guardar { background:#0b8a72; border-color:#0b8a72; color:#fff; font-weight:700; }
   .inf-btn-regen-objetivo { font-family:inherit; font-size:13px; line-height:1; margin-left:.6rem; padding:.28rem .5rem; border:1px solid #0b8a72; border-radius:6px; background:#eafaf5; color:#0b6a52; cursor:pointer; font-weight:600; vertical-align:middle; }
   .inf-btn-regen-objetivo:disabled { opacity:.6; cursor:default; }
+  .inf-estilo-obj { font-family:inherit; font-size:12px; margin-left:.35rem; padding:.25rem .35rem; border:1px solid #0b8a72; border-radius:6px; background:#fff; color:#0b6a52; font-weight:600; vertical-align:middle; cursor:pointer; }
   .inf-regen-mensaje { font-size:11px; margin:.2rem 0 .5rem; min-height:1em; }
   .inf-regen-mensaje.error { color:#c0392b; }
   .inf-regen-mensaje.ok { color:#0a6a44; }
@@ -7580,7 +8249,7 @@ Acciones ejecutadas: ${acciones || '—'}
     .inf-toolbar { display:none; }
     .inf-firma-borrar { display:none; }
     .firma-modal-bg { display:none !important; }
-    .inf-btn-regen-objetivo { display:none !important; }
+    .inf-btn-regen-objetivo, .inf-estilo-obj { display:none !important; }
     .inf-regen-mensaje { display:none !important; }
     body { padding: 0; }
     /* La tabla se desplaza horizontalmente en pantalla chica; al imprimir vuelve a
@@ -7638,6 +8307,10 @@ Acciones ejecutadas: ${acciones || '—'}
 
   <div class="inf-seccion-titulo">1. Objetivo de la visita.
     <button type="button" class="inf-btn-regen-objetivo" id="inf-btn-regen-objetivo" onclick="_infRegenerarObjetivo()" title="Regenerar objetivo con IA" style="${localStorage.getItem('rdps_ia_funciones_visibles') === '1' ? '' : 'display:none'}">🔄</button>
+    <select class="inf-estilo-obj" id="inf-estilo-objetivo" title="Estilo de redacción del objetivo con IA" onchange="_infGuardarEstiloObjetivo()" style="${localStorage.getItem('rdps_ia_funciones_visibles') === '1' ? '' : 'display:none'}">
+      <option value="tecnico"${localStorage.getItem('rdps_estilo_ia') === 'sencillo' ? '' : ' selected'}>🩺 Técnico</option>
+      <option value="sencillo"${localStorage.getItem('rdps_estilo_ia') === 'sencillo' ? ' selected' : ''}>🏘️ Comunitario</option>
+    </select>
   </div>
   <div class="inf-texto-box chico" id="inf-objetivo-box" contenteditable="true" data-ph="Completar..." data-nombre="${_infEsc(ta(d.nombre))}">${_infEsc(ta(d.objetivo))}</div>
   <div class="inf-regen-mensaje" id="inf-regen-mensaje"></div>
@@ -7937,7 +8610,14 @@ Acciones ejecutadas: ${acciones || '—'}
       if (!el) return;
       el.addEventListener('blur', function() {
         if (!window.parent || typeof window.parent._infGuardarCampoRegistro !== 'function') return;
-        window.parent._infGuardarCampoRegistro(nombreCampo, el.textContent.trim(), _infHuellaActual);
+        // Si el interruptor de MAYÚSCULAS está activo, cualquier edición manual hecha
+        // aquí dentro del informe también se convierte antes de guardarse.
+        var valor = el.textContent.trim();
+        if (window.parent.rdpsMayusculasActivo && window.parent.rdpsMayusculasActivo()) {
+          valor = valor.toUpperCase();
+          if (el.textContent.trim() !== valor) el.textContent = valor;
+        }
+        window.parent._infGuardarCampoRegistro(nombreCampo, valor, _infHuellaActual);
       });
     }
     _infCablearCampoPersistente('inf-expediente-box', 'expediente');
@@ -7980,6 +8660,50 @@ Acciones ejecutadas: ${acciones || '—'}
       });
     })();
 
+    // Botón "🔠 Mayús." de la barra superior (fuera del iframe): convierte a MAYÚSCULAS
+    // TODOS los campos editables de este informe ya generado (encabezado, tabla de signos
+    // vitales, hallazgos, acciones, acuerdo y nombres junto a las firmas) y guarda cada uno,
+    // igual que si el promotor lo hubiera escrito así a mano.
+    window._infConvertirTodoMayusculas = function () {
+      var camposTexto = {
+        'inf-establecimiento-box': 'establecimiento',
+        'inf-fecha-box': 'fechaMostrar',
+        'inf-expediente-box': 'expediente',
+        'inf-nombre-vivienda-box': 'nombreVivienda',
+        'inf-horainicio-box': 'horaInicio',
+        'inf-horafin-box': 'horaFin',
+        'inf-objetivo-box': 'objetivo',
+        'inf-hallazgos-box': 'hallazgos',
+        'inf-acciones-box': 'acciones',
+        'inf-acuerdo-box': 'acuerdo',
+        'inf-fechaseg-box': 'fechaSeguimiento',
+        'inf-firmausuario-nombre-box': 'firmaUsuarioNombre',
+        'inf-firmapersonal-nombre-box': 'firmaPersonalNombre'
+      };
+      var puedeGuardar = !!(window.parent && typeof window.parent._infGuardarCampoRegistro === 'function');
+      Object.keys(camposTexto).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var valor = el.textContent.trim().toUpperCase();
+        el.textContent = valor;
+        if (puedeGuardar) window.parent._infGuardarCampoRegistro(camposTexto[id], valor, _infHuellaActual);
+      });
+      var tabla = document.getElementById('inf-tabla-vitales');
+      if (tabla) {
+        var filas = [];
+        tabla.querySelectorAll('tbody tr').forEach(function (tr) {
+          var fila = [];
+          tr.querySelectorAll('td[contenteditable="true"]').forEach(function (td) {
+            var v = td.textContent.trim().toUpperCase();
+            td.textContent = v;
+            fila.push(v);
+          });
+          filas.push(fila);
+        });
+        if (puedeGuardar) window.parent._infGuardarCampoRegistro('tablaVitales', JSON.stringify(filas), _infHuellaActual);
+      }
+    };
+
     // Permite volver a redactar SOLO el objetivo con IA (por ejemplo si se generó sin
     // internet con el cálculo local, y ahora ya hay señal). Actualiza únicamente el
     // texto del recuadro "Objetivo": no recarga la ficha, así que las firmas ya hechas
@@ -7998,6 +8722,14 @@ Acciones ejecutadas: ${acciones || '—'}
       }
     }
     var _infRegenMsgTimeout = null;
+
+    function _infEstiloObjetivoActual() {
+      var el = document.getElementById('inf-estilo-objetivo');
+      return (el && el.value === 'sencillo') ? 'sencillo' : 'tecnico';
+    }
+    function _infGuardarEstiloObjetivo() {
+      try { localStorage.setItem('rdps_estilo_ia', _infEstiloObjetivoActual()); } catch (e) {}
+    }
 
     async function _infRegenerarObjetivo() {
       var btn = document.getElementById('inf-btn-regen-objetivo');
@@ -8020,13 +8752,16 @@ Acciones ejecutadas: ${acciones || '—'}
       _infMostrarMensajeRegen('', '');
 
       try {
-        var nuevoObjetivo = await window.parent._infGenerarObjetivoIA(nombre, hallazgos, acciones);
+        var nuevoObjetivo = await window.parent._infGenerarObjetivoIA(nombre, hallazgos, acciones, _infEstiloObjetivoActual());
         if (nuevoObjetivo) {
+          if (window.parent.rdpsMayusculasActivo && window.parent.rdpsMayusculasActivo()) {
+            nuevoObjetivo = nuevoObjetivo.toUpperCase();
+          }
           cajaObjetivo.textContent = nuevoObjetivo;
           if (window.parent && typeof window.parent._infGuardarCampoRegistro === 'function') {
             window.parent._infGuardarCampoRegistro('objetivo', nuevoObjetivo, _infHuellaActual);
           }
-          _infMostrarMensajeRegen('✅ Objetivo redactado con IA', 'ok');
+          _infMostrarMensajeRegen(_infEstiloObjetivoActual() === 'sencillo' ? '✅ Objetivo redactado con IA (estilo técnico comunitario)' : '✅ Objetivo redactado con IA', 'ok');
         } else {
           _infMostrarMensajeRegen('⚠️ Sin internet o IA no disponible en este momento. El objetivo actual no se modificó — puedes intentar de nuevo más tarde.', 'error');
         }
@@ -8087,7 +8822,7 @@ Acciones ejecutadas: ${acciones || '—'}
       registros[idx].referenciaCampos[campo] = valor;
       if (huella) registros[idx].referenciaCampos._huella = huella;
       registros[idx].actualizadoEn = new Date().toISOString();
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       return true;
     }
 
@@ -8200,7 +8935,9 @@ Acciones ejecutadas: ${acciones || '—'}
       _refGuardarHistorialAperturas();
     }
 
-    async function _refGenerarReferenciaIA(nombre, edad, motivo, accion) {
+    async function _refGenerarReferenciaIA(nombre, edad, motivo, accion, estiloParam) {
+      const estilo = (estiloParam === 'sencillo' || estiloParam === 'tecnico') ? estiloParam : rdpsGetEstiloIA();
+      const sencillo = estilo === 'sencillo';
       const proveedorId = rdpsProveedorActual();
       const proveedor = RDPS_PROVEEDORES[proveedorId];
       const apiKey = localStorage.getItem(proveedor.keyStorage);
@@ -8213,7 +8950,7 @@ Acciones ejecutadas: ${acciones || '—'}
       // Si ya se generaron referencias antes en esta misma sesión/día, se le pide a la IA
       // que evite repetir esas mismas aperturas — así cada referencia arranca distinto.
       let refuerzoVariedadRef = '';
-      if (_refHistorialAperturas.motivo.length || _refHistorialAperturas.accion.length) {
+      if (!sencillo && (_refHistorialAperturas.motivo.length || _refHistorialAperturas.accion.length)) {
         refuerzoVariedadRef = `\nEVITA REPETIR APERTURAS YA USADAS EN REFERENCIAS ANTERIORES DE ESTA MISMA SESIÓN (elige una alternativa distinta a estas, o inventa una construcción equivalente que no esté en esta lista):`;
         if (_refHistorialAperturas.motivo.length) {
           refuerzoVariedadRef += `\n   - Para "Motivo", NO uses: ${_refHistorialAperturas.motivo.join(', ')}`;
@@ -8223,13 +8960,31 @@ Acciones ejecutadas: ${acciones || '—'}
         }
       }
 
+      const _refAperturasMotivoSencillo = [
+        'Se refiere a la persona por', 'Se envía al establecimiento de salud por', 'Requiere valoración en el establecimiento de salud por',
+        'Se refiere para evaluación debido a', 'Se refiere porque presenta', 'Necesita atención en el establecimiento de salud por'
+      ];
+      const _refAperturasAccionSencillo = [
+        'Antes de la referencia, se brindó consejería sobre', 'Previo a la referencia, se tomaron los signos vitales y se orientó sobre',
+        'Se verificaron los signos vitales y se orientó a la persona sobre', 'Como primera atención, se realizó',
+        'Antes de referir, se explicó', 'Previo al traslado, se verificó'
+      ];
+      const listaMotivoRef = sencillo ? _refAperturasMotivoSencillo : _refAperturasMotivo;
+      const listaAccionRef = sencillo ? _refAperturasAccionSencillo : _refAperturasAccion;
+      const tonoRef = sencillo
+        ? 'el registro de un técnico o promotor de salud comunitaria (lenguaje profesional pero claro y directo, con los términos propios del primer nivel de atención, sin jerga clínica especializada y sin sonar coloquial), tercera persona, pretérito simple'
+        : 'tono clínico formal, tercera persona, pretérito perfecto';
+      const reglaSencilla = sencillo ? `
+ESTILO: TÉCNICO EN SALUD COMUNITARIA (regla crítica, SUSTITUYE las indicaciones de "tono clínico formal"): redacta con el registro profesional de un promotor o técnico de salud comunitaria: claro, preciso y directo, entendible para el personal del establecimiento y para la comunidad, sin sonar coloquial, infantil ni simplista. Usa con naturalidad los términos del primer nivel de atención (hipertensión arterial, diabetes, control prenatal, signos de peligro, consejería, signos vitales, referencia) sin simplificarlos. Solo reemplaza el vocabulario clínico especializado u hospitalario por su equivalente claro (ej. "síntomas" en vez de "sintomatología", "dolor de cabeza" en vez de "cefalea", "dificultad para respirar" en vez de "disnea", "hinchazón" en vez de "edema"). Solo cambia el REGISTRO del lenguaje, no el contenido: todas las demás reglas siguen vigentes y las cifras (signos vitales, semanas, fechas) se conservan exactas.
+` : '';
+
       const prompt = `
 Eres un asistente para promotores de salud comunitaria en El Salvador (formato oficial MINSAL de REFERENCIA COMUNITARIA, el documento que el promotor entrega al establecimiento de salud para que reciba y atienda a la persona referida).
 
-Con base ÚNICAMENTE en las notas de campo de abajo (que vienen del registro diario de una visita domiciliaria), redacta en tono clínico formal, tercera persona, pretérito perfecto, los DOS textos de la referencia:
+Con base ÚNICAMENTE en las notas de campo de abajo (que vienen del registro diario de una visita domiciliaria), redacta en ${tonoRef}, los DOS textos de la referencia:
 
 1. "Motivo o situación por la que se refiere": explica CLARAMENTE por qué se refiere a la persona al establecimiento de salud — el hallazgo, signo de alarma o condición de SALUD PERSONAL que justifica que sea evaluada/atendida allí. Es una justificación de referencia, no un resumen narrativo de la visita.
-2. "Acción realizada por el/la Promotor(a) de Salud antes de la referencia": describe, en tono formal, lo que el promotor ya hizo específicamente POR ESA PERSONA antes de decidir referirla (por ejemplo: toma de signos vitales, orientación clínica brindada, primeros cuidados, verificación de signos de alarma).
+2. "Acción realizada por el/la Promotor(a) de Salud antes de la referencia": describe, en el mismo tono indicado, lo que el promotor ya hizo específicamente POR ESA PERSONA antes de decidir referirla (por ejemplo: toma de signos vitales, orientación clínica brindada, primeros cuidados, verificación de signos de alarma).
 
 ENFOQUE EXCLUSIVO EN LA PERSONA REFERIDA (muy importante, regla no negociable):
 - Los dos textos deben tratar ÚNICAMENTE la condición de salud, síntomas, signos o situación clínica/personal de LA PERSONA que se está refiriendo.
@@ -8237,11 +8992,11 @@ ENFOQUE EXCLUSIVO EN LA PERSONA REFERIDA (muy importante, regla no negociable):
 - Extrae solo la parte de las notas que corresponde a la salud de la persona referida; descarta todo lo demás aunque esté en el mismo párrafo.
 
 VARIEDAD OBLIGATORIA EN LA REDACCIÓN (muy importante, regla no negociable):
-- NUNCA empieces ambos textos con la misma palabra o fórmula (ej. no comiences los dos con "Se..."). Cada vez que redactes, elige una apertura distinta y natural para "Motivo", como por ejemplo: ${_refAperturasMotivo.join(', ')}, u otra construcción equivalente que transmita lo mismo con otras palabras.
-- Para "Acción", varía igualmente la apertura, por ejemplo: ${_refAperturasAccion.join(', ')}, u otra construcción equivalente.
+- NUNCA empieces ambos textos con la misma palabra o fórmula (ej. no comiences los dos con "Se..."). Cada vez que redactes, elige una apertura distinta y natural para "Motivo", como por ejemplo: ${listaMotivoRef.join(', ')}, u otra construcción equivalente que transmita lo mismo con otras palabras.
+- Para "Acción", varía igualmente la apertura, por ejemplo: ${listaAccionRef.join(', ')}, u otra construcción equivalente.
 - No uses siempre la misma estructura de oración entre una referencia y otra: cambia el orden, los conectores y las palabras, sin perder el sentido clínico ni la información.
 ${refuerzoVariedadRef}
-
+${reglaSencilla}
 REGLAS (no negociables):
 - Basarte ÚNICAMENTE en lo que aparece en las notas; NO inventes diagnósticos, cifras, antecedentes ni procedimientos que no estén ya mencionados.
 - Conserva intactos los datos concretos que ya aparezcan sobre la persona (cifras de signos vitales, semanas de gestación, fechas, etc.).
@@ -8277,8 +9032,10 @@ Notas (Acciones ya escritas): ${accion || '—'}
         const accionIA = m[2].trim().replace(/^["'“”]+|["'“”]+$/g, '');
         if (!motivoIA && !accionIA) return null;
 
-        _refRegistrarAperturaUsada(_refHistorialAperturas.motivo, _refDetectarApertura(motivoIA, _refAperturasMotivo));
-        _refRegistrarAperturaUsada(_refHistorialAperturas.accion, _refDetectarApertura(accionIA, _refAperturasAccion));
+        if (!sencillo) {
+          _refRegistrarAperturaUsada(_refHistorialAperturas.motivo, _refDetectarApertura(motivoIA, _refAperturasMotivo));
+          _refRegistrarAperturaUsada(_refHistorialAperturas.accion, _refDetectarApertura(accionIA, _refAperturasAccion));
+        }
 
         return { motivo: motivoIA, accion: accionIA };
       } catch (err) {
@@ -8368,6 +9125,18 @@ Notas (Acciones ya escritas): ${accion || '—'}
       document.getElementById('modal-referencia-minsal').classList.add('show');
     }
 
+    // Convierte a MAYÚSCULAS todo el contenido editable de la Referencia Comunitaria que
+    // está actualmente abierta (ambas hojas: Referencia y Respuesta a la Referencia) y
+    // guarda cada campo convertido, igual que si el promotor lo hubiera escrito así a mano.
+    function convertirReferenciaAMayusculas() {
+      const iframe = document.getElementById('referencia-minsal-iframe');
+      const win = iframe && iframe.contentWindow;
+      if (win && typeof win._refConvertirTodoMayusculas === 'function') {
+        win._refConvertirTodoMayusculas();
+        toast('🔠 Referencia convertida a MAYÚSCULAS');
+      }
+    }
+
     function cerrarReferenciaMINSAL() {
       document.getElementById('modal-referencia-minsal').classList.remove('show');
       document.getElementById('referencia-minsal-iframe').srcdoc = '';
@@ -8420,12 +9189,14 @@ Notas (Acciones ya escritas): ${accion || '—'}
   .ref-btn-ia { display:block; width:100%; margin:.7rem 0 .2rem; padding:.6rem 1rem; border:none; border-radius:9px; font-family:inherit; font-size:12.5px; font-weight:700; color:#fff; cursor:pointer; background:linear-gradient(180deg,#1e40af 0%,#1e3a8a 100%); box-shadow:0 2px 0 #1e3a8a; }
   .ref-btn-ia:hover { filter:brightness(1.1); }
   .ref-btn-ia:disabled { opacity:.65; cursor:default; }
+  .ref-estilo-fila { text-align:center; margin:.6rem 0 0; font-size:12px; font-weight:700; color:#1e3a8a; }
+  .ref-estilo-fila select { font-family:inherit; font-size:12px; font-weight:700; color:#1e3a8a; background:#fff; border:1px solid #1e3a8a; border-radius:6px; padding:.2rem .4rem; margin-left:.3rem; cursor:pointer; }
   .inf-regen-mensaje { font-size:11px; margin:.1rem 0 .6rem; min-height:1em; text-align:center; }
   .inf-regen-mensaje.error { color:#c0392b; }
   .inf-regen-mensaje.ok { color:#0a6a44; }
   @media print {
     .inf-toolbar { display:none; }
-    .ref-btn-ia { display:none !important; }
+    .ref-btn-ia, .ref-estilo-fila { display:none !important; }
     .inf-regen-mensaje { display:none !important; }
     body { padding: 0; }
     .inf-linea, .inf-campo-full { page-break-inside: avoid; break-inside: avoid; }
@@ -8480,6 +9251,13 @@ Notas (Acciones ya escritas): ${accion || '—'}
       <span class="inf-valor" id="ref-establecimiento-box" contenteditable="true" style="min-width:55%" data-ph="Completar...">${_infEsc(ta(d.establecimientoRefiere))}</span>
     </div>
 
+    <div class="ref-estilo-fila" id="ref-estilo-fila" style="${localStorage.getItem('rdps_ia_funciones_visibles') === '1' ? '' : 'display:none'}">
+      <label for="ref-estilo-ia">🗣️ Estilo de redacción:</label>
+      <select id="ref-estilo-ia" onchange="_refGuardarEstilo()">
+        <option value="tecnico"${localStorage.getItem('rdps_estilo_ia') === 'sencillo' ? '' : ' selected'}>🩺 Técnico profesional</option>
+        <option value="sencillo"${localStorage.getItem('rdps_estilo_ia') === 'sencillo' ? ' selected' : ''}>🏘️ Técnico comunitario</option>
+      </select>
+    </div>
     <button type="button" class="ref-btn-ia" id="ref-btn-ia" onclick="_refGenerarConIA()" style="${localStorage.getItem('rdps_ia_funciones_visibles') === '1' ? '' : 'display:none'}">✨ Generar Referencia Profesional</button>
     <div class="inf-regen-mensaje" id="ref-ia-mensaje"></div>
 
@@ -8568,6 +9346,43 @@ Notas (Acciones ya escritas): ${accion || '—'}
     _refCablearCampoPersistente('ref-resena-box', 'resenaResp');
     _refCablearCampoPersistente('ref-recomendacion-box', 'recomendacionResp');
 
+    // Botón "🔠 Mayús." de la barra superior (fuera del iframe): convierte a MAYÚSCULAS
+    // TODOS los campos editables de esta referencia ya generada (ambas hojas) y guarda
+    // cada uno, igual que si el promotor lo hubiera escrito así a mano.
+    window._refConvertirTodoMayusculas = function () {
+      var camposTexto = {
+        'ref-fecha-box': 'fechaMostrar',
+        'ref-hora-box': 'horaMostrar',
+        'ref-nombre-box': 'nombreMostrar',
+        'ref-edad-box': 'edadMostrar',
+        'ref-temperatura-box': 'temperaturaMostrar',
+        'ref-ta-box': 'taMostrar',
+        'ref-fr-box': 'frMostrar',
+        'ref-pulso-box': 'pulsoMostrar',
+        'ref-residencia-box': 'residenciaMostrar',
+        'ref-municipio-box': 'municipioMostrar',
+        'ref-establecimiento-box': 'establecimientoRefiere',
+        'ref-motivo-box': 'motivoReferencia',
+        'ref-accion-box': 'accionPromotor',
+        'ref-promotor-box': 'nombrePromotor',
+        'ref-fecharesp-box': 'fechaResp',
+        'ref-horaresp-box': 'horaResp',
+        'ref-establecimientoresp-box': 'establecimientoResp',
+        'ref-profesional-box': 'profesionalResp',
+        'ref-nombreusuario-box': 'nombreUsuarioResp',
+        'ref-resena-box': 'resenaResp',
+        'ref-recomendacion-box': 'recomendacionResp'
+      };
+      var puedeGuardar = !!(window.parent && typeof window.parent._refGuardarCampoRegistro === 'function');
+      Object.keys(camposTexto).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var valor = el.textContent.trim().toUpperCase();
+        el.textContent = valor;
+        if (puedeGuardar) window.parent._refGuardarCampoRegistro(camposTexto[id], valor, _refHuellaActual);
+      });
+    };
+
     // Botón "✨ Generar Referencia Profesional": toma lo que ya está escrito en
     // "Motivo" y "Acción" (que arrancan con los Hallazgos/Acciones del registro diario) y
     // le pide a la IA que lo redacte en tono formal y específicamente adaptado a una
@@ -8588,6 +9403,14 @@ Notas (Acciones ya escritas): ${accion || '—'}
       }
     }
     var _refIaMsgTimeout = null;
+
+    function _refEstiloActual() {
+      var el = document.getElementById('ref-estilo-ia');
+      return (el && el.value === 'sencillo') ? 'sencillo' : 'tecnico';
+    }
+    function _refGuardarEstilo() {
+      try { localStorage.setItem('rdps_estilo_ia', _refEstiloActual()); } catch (e) {}
+    }
 
     async function _refGenerarConIA() {
       var btn = document.getElementById('ref-btn-ia');
@@ -8617,7 +9440,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       _refMostrarMensajeIA('', '');
 
       try {
-        var resultado = await window.parent._refGenerarReferenciaIA(nombre, edad, motivoActual, accionActual);
+        var resultado = await window.parent._refGenerarReferenciaIA(nombre, edad, motivoActual, accionActual, _refEstiloActual());
         if (resultado && (resultado.motivo || resultado.accion)) {
           if (resultado.motivo) {
             cajaMotivo.textContent = resultado.motivo;
@@ -8631,7 +9454,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
               window.parent._refGuardarCampoRegistro('accionPromotor', resultado.accion, _refHuellaActual);
             }
           }
-          _refMostrarMensajeIA('✅ Referencia redactada con IA — revisa antes de imprimir', 'ok');
+          _refMostrarMensajeIA(_refEstiloActual() === 'sencillo' ? '✅ Referencia redactada con IA (estilo técnico comunitario) — revisa antes de imprimir' : '✅ Referencia redactada con IA — revisa antes de imprimir', 'ok');
         } else {
           _refMostrarMensajeIA('⚠️ Sin internet, sin clave API configurada, o la IA no está disponible en este momento.', 'error');
         }
@@ -8678,6 +9501,403 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
 
     // ════════════════════════════════════
+    // SEGUIMIENTO POR GRUPOS ETARIOS
+    // Toma de los registros diarios a las personas que fueron visitadas en el día, mes o año
+    // elegido (cada persona se cuenta una sola vez aunque tenga varias visitas) y las ordena
+    // por grupo de edad. El SEXO y la fecha de nacimiento se buscan en el catálogo (misma
+    // vivienda + mismo nombre). La edad se calcula a la fecha de la visita; si la persona no
+    // está en el catálogo o no tiene fecha de nacimiento, se usa la edad escrita en el registro.
+    // Una persona puede contar en dos grupos (mujeres de 18 y 19 años: adolescentes y MEF).
+    // ════════════════════════════════════
+    const GE_GRUPOS = [
+      { id: 'adol',  corto: 'Adolescente',  icono: '🧒', nombre: 'Adolescentes',           detalle: '12 a 19 años · femeninos y masculinos', test: (a, s) => a >= 12 && a <= 19 },
+      { id: 'mef',   corto: 'MEF',          icono: '🤰', nombre: 'Mujeres en edad fértil', detalle: '18 a 49 años',                          test: (a, s) => s === 'F' && a >= 18 && a <= 49 },
+      { id: 'adm',   corto: 'Adulto masc.', icono: '👨', nombre: 'Adultos masculinos',     detalle: '20 a 59 años',                          test: (a, s) => s === 'M' && a >= 20 && a <= 59 },
+      { id: 'm5059', corto: 'Mujer 50-59',  icono: '👩', nombre: 'Mujeres de 50 a 59 años', detalle: '50 a 59 años',                         test: (a, s) => s === 'F' && a >= 50 && a <= 59 },
+      { id: 'am',    corto: 'Adulto mayor', icono: '🧓', nombre: 'Adultos mayores',        detalle: '60 años en adelante · ambos sexos',     test: (a, s) => a >= 60 }
+    ];
+    let _gePeriodo = 'hoy';
+    let _geGrupoSel = 'todos';
+    let _geCache = null;             // resultado de _geConstruir() para no recalcularlo al buscar
+    let _geBuscarT = null;
+    let _geVisibles = [];            // personas que se están mostrando (para el botón del ojito)
+    const _geAbiertos = new Set();   // personas con las fechas desplegadas
+
+    function _geEsc(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function _geNorm(s) {
+      return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+    }
+    function _geTok(s) {
+      return _geNorm(s).replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(Boolean).sort().join(' ');
+    }
+    function _geFnacISO(v) {
+      const s = String(v || '').trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
+    }
+    // Años cumplidos a la fecha de la visita
+    function _geEdadEnFecha(fnacISO, ymd) {
+      if (!fnacISO || !ymd) return null;
+      const [fy, fm, fd] = fnacISO.split('-').map(Number);
+      const [vy, vm, vd] = String(ymd).split('-').map(Number);
+      if (!fy || !vy) return null;
+      let a = vy - fy;
+      if (vm < fm || (vm === fm && vd < fd)) a--;
+      return (a >= 0 && a <= 120) ? a : null;
+    }
+    // Edad escrita en el registro: "35 años", "1 año 2 meses", "8 meses" (→ 0), "35"
+    function _geEdadDeTexto(t) {
+      const s = _geNorm(t);
+      if (!s) return null;
+      let m = s.match(/(\d+)\s*anos?/);
+      if (m) return parseInt(m[1], 10);
+      if (/mes|dia|semana/.test(s)) return 0;
+      m = s.match(/^(\d{1,3})$/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+    function _geIndiceCatalogo() {
+      const idx = {};
+      getCatalogo().forEach(v => {
+        const k = _geNorm(v.vivienda);
+        (idx[k] || (idx[k] = [])).push(...(v.personas || []).map(p => ({ p, vivId: v.id })));
+        if (!idx['#' + k]) idx['#' + k] = v.id; // id de la vivienda, aunque la persona no esté en el catálogo
+      });
+      return idx;
+    }
+    // Devuelve { p, vivId } si la persona está en el catálogo, o null
+    function _geBuscarEnCatalogo(idx, viv, nombre) {
+      const lista = idx[_geNorm(viv)] || [];
+      const nk = _geNorm(nombre);
+      let e = lista.find(x => _geNorm(x.p.nombre) === nk);
+      if (!e) { const tk = _geTok(nombre); e = lista.find(x => _geTok(x.p.nombre) === tk); }
+      return e || null;
+    }
+
+    function _geRegistrosDelPeriodo() {
+      let fecha = null, prefijo = null;
+      if (_gePeriodo === 'hoy') fecha = hoy();
+      else if (_gePeriodo === 'dia') fecha = document.getElementById('ge-fecha').value || hoy();
+      else {
+        const ahora = new Date();
+        const anio = document.getElementById('ge-anio').value || ahora.getFullYear();
+        if (_gePeriodo === 'anio') prefijo = `${anio}-`;
+        else {
+          const mes = document.getElementById('ge-mes').value || String(ahora.getMonth() + 1).padStart(2, '0');
+          prefijo = `${anio}-${String(mes).padStart(2, '0')}-`;
+        }
+      }
+      return registros.filter(r => r.fecha && (fecha ? r.fecha === fecha : String(r.fecha).startsWith(prefijo)));
+    }
+
+    // Personas únicas visitadas en el período, con sexo, edad y grupos a los que pertenecen
+    function _geConstruir() {
+      const regs = _geRegistrosDelPeriodo().slice().sort((a, b) =>
+        String(b.fecha).localeCompare(String(a.fecha)) || String(b.hora || '').localeCompare(String(a.hora || '')));
+      const idx = _geIndiceCatalogo();
+      const mapa = {}, lista = [];
+      regs.forEach(r => {
+        const nombre = String(r.nombre || '').trim();
+        if (!nombre) return;
+        const key = _geNorm(r.vivienda) + '|' + _geTok(nombre);
+        let o = mapa[key];
+        if (!o) {
+          const ent = _geBuscarEnCatalogo(idx, r.vivienda, nombre);
+          const cat = ent ? ent.p : null;
+          const fnac = cat ? _geFnacISO(cat.fnac) : '';
+          let edad = fnac ? _geEdadEnFecha(fnac, r.fecha) : null;
+          if (edad == null) edad = _geEdadDeTexto(r.edad);
+          const sexo = (cat && (cat.sexo === 'F' || cat.sexo === 'M')) ? cat.sexo : '';
+          o = { key, nombre, vivienda: r.vivienda || '', fecha: r.fecha, edad, sexo, visitas: 0, fechas: [], grupos: [],
+                catVivId: ent ? ent.vivId : (idx['#' + _geNorm(r.vivienda)] || null), catPerId: cat ? cat.id : null };
+          o.grupos = GE_GRUPOS.filter(g => edad != null && g.test(edad, sexo)).map(g => g.id);
+          mapa[key] = o; lista.push(o);
+        }
+        o.visitas++;
+        o.fechas.push({ fecha: r.fecha, hora: r.hora || '' }); // ya vienen de la más reciente a la más antigua
+      });
+      lista.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      return lista;
+    }
+
+    const _geEsMenor    = o => o.edad != null && o.edad < 12;
+    const _geFaltaSexo  = o => !o.sexo && o.edad != null && o.edad >= 18 && o.edad <= 59;
+    const _geSinEdad    = o => o.edad == null;
+
+    function _geFiltrar(lista, sel) {
+      if (sel === 'todos') return lista;
+      if (sel === 'menores') return lista.filter(_geEsMenor);
+      if (sel === 'faltasexo') return lista.filter(_geFaltaSexo);
+      if (sel === 'sinedad') return lista.filter(_geSinEdad);
+      return lista.filter(o => o.grupos.includes(sel));
+    }
+
+    function _geCambiarPeriodo(p) {
+      _gePeriodo = p;
+      ['hoy', 'dia', 'mes', 'anio'].forEach(x => {
+        const b = document.getElementById('ge-periodo-' + x);
+        if (b) b.classList.toggle('active', x === p);
+      });
+      const cDia = document.getElementById('ge-campos-dia');
+      const cMes = document.getElementById('ge-campos-mes');
+      const gMes = document.getElementById('ge-grupo-mes');
+      if (cDia) cDia.style.display = (p === 'dia') ? '' : 'none';
+      if (cMes) cMes.style.display = (p === 'mes' || p === 'anio') ? '' : 'none';
+      if (gMes) gMes.style.display = (p === 'mes') ? '' : 'none';
+      const fechaEl = document.getElementById('ge-fecha');
+      if (p === 'dia' && fechaEl && !fechaEl.value) fechaEl.value = hoy();
+      if (p === 'mes' || p === 'anio') {
+        const ahora = new Date();
+        const anioEl = document.getElementById('ge-anio'), mesEl = document.getElementById('ge-mes');
+        if (anioEl && !anioEl.value) anioEl.value = ahora.getFullYear();
+        if (mesEl && !mesEl.value) mesEl.value = String(ahora.getMonth() + 1).padStart(2, '0');
+      }
+      _geRender();
+    }
+
+    // 👁 Muestra u oculta las fechas en que se visitó a la persona
+    function _geToggleFechas(i) {
+      const o = _geVisibles[i];
+      if (!o) return;
+      const panel = document.getElementById('ge-fechas-' + i);
+      const btn = document.getElementById('ge-ojo-' + i);
+      const abrir = !_geAbiertos.has(o.key);
+      if (abrir) _geAbiertos.add(o.key); else _geAbiertos.delete(o.key);
+      if (panel) panel.style.display = abrir ? '' : 'none';
+      if (btn) btn.innerHTML = abrir ? '🙈 Ocultar fechas' : '👁 Ver fechas';
+    }
+    function _geHoraTxt(h) {
+      const m = /^(\d{2}):(\d{2})$/.exec(h || '');
+      if (!m) return '';
+      let hh = parseInt(m[1], 10); const ap = hh >= 12 ? 'p. m.' : 'a. m.';
+      hh = hh % 12 || 12;
+      return hh + ':' + m[2] + ' ' + ap;
+    }
+
+    // Abre el catálogo mostrando solo la vivienda de esa persona, para corregir sexo, fecha de nacimiento o edad
+    function _geAbrirFamilia(i) {
+      const o = _geVisibles[i];
+      if (!o || !o.catVivId) return;
+      irA('screen-catalogo');
+      verFamiliaCompleta(o.catVivId, o.catPerId || '');
+    }
+
+    // Cambia el nombre en los registros de esa vivienda cuyo nombre (mismas palabras, en cualquier orden)
+    // era `viejo`. Marca cada registro como modificado para que "Subir a la nube" lo detecte.
+    function _geRenombrarRegistros(vivienda, viejo, nuevo) {
+      const vk = _geNorm(vivienda), tk = _geTok(viejo), nuevoMay = _rdpsMay(nuevo);
+      if (!tk || !nuevoMay) return 0;
+      const ts = new Date().toISOString();
+      let n = 0;
+      registros.forEach(r => {
+        if (_geNorm(r.vivienda) !== vk) return;
+        if (_geTok(r.nombre) !== tk) return;
+        if (r.nombre === nuevoMay) return;
+        r.nombre = nuevoMay;
+        r.actualizadoEn = ts;
+        n++;
+      });
+      if (n) _rdpsGuardarRegistrosLS();
+      return n;
+    }
+
+    let _geVincIdx = null;
+    function _geAbrirVincular(i) {
+      const o = _geVisibles[i];
+      if (!o || !o.catVivId) return;
+      const viv = getCatalogo().find(v => v.id === o.catVivId);
+      if (!viv) return;
+      _geVincIdx = i;
+      const palabras = new Set(_geTok(o.nombre).split(' ').filter(Boolean));
+      const filas = (viv.personas || []).map(p => ({
+        p, score: _geTok(p.nombre).split(' ').filter(w => palabras.has(w)).length
+      })).sort((a, b) => b.score - a.score || a.p.nombre.localeCompare(b.p.nombre, 'es'));
+      document.getElementById('ge-vinc-sub').innerHTML =
+        'En los registros aparece como <b>«' + _geEsc(o.nombre) + '»</b> (vivienda ' + _geEsc(o.vivienda) + ', ' + o.visitas + ' visita' + (o.visitas !== 1 ? 's' : '') + '), ' +
+        'pero ese nombre no coincide con ningún integrante del catálogo. Elige quién es: se cambiará el nombre en <b>todos</b> sus registros y así se podrá ubicar en su grupo.';
+      document.getElementById('ge-vinc-lista').innerHTML = filas.length
+        ? filas.map((f, k) => {
+            const fnac = _geFnacISO(f.p.fnac);
+            const edad = fnac ? calcularEdadTexto(fnac) : (f.p.edad || 'sin edad');
+            const sexo = f.p.sexo === 'F' ? '♀ Femenino' : f.p.sexo === 'M' ? '♂ Masculino' : 'sin sexo';
+            const sug = k === 0 && f.score > 0;
+            return '<div class="ge-vinc-fila' + (sug ? ' sug' : '') + '">' +
+              '<span class="rm-n">' + (k + 1) + '</span>' +
+              '<div class="ge-vinc-info"><div class="ge-vinc-nombre">' + _geEsc(f.p.nombre) + '</div>' +
+              '<div class="ge-vinc-meta">' + _geEsc(edad) + ' · ' + sexo + (sug ? ' · <b style="color:#0b8a72">Sugerida</b>' : '') + '</div></div>' +
+              '<button type="button" class="ge-vinc-btn" onclick="_geVincular(\'' + _geEsc(f.p.id) + '\')">Es esta</button></div>';
+          }).join('')
+        : '<div class="rm-empty">Esta vivienda no tiene integrantes en el catálogo. Usa «Abrir familia y corregir» para agregarlos.</div>';
+      document.getElementById('modal-ge-vincular').classList.add('show');
+    }
+    function _geCerrarVincular() {
+      document.getElementById('modal-ge-vincular').classList.remove('show');
+      _geVincIdx = null;
+    }
+    function _geVincular(perId) {
+      const o = _geVisibles[_geVincIdx];
+      if (!o) return;
+      const viv = getCatalogo().find(v => v.id === o.catVivId);
+      const p = viv && (viv.personas || []).find(x => x.id === perId);
+      if (!p) return;
+      if (!confirm('Se cambiará el nombre en todos los registros de la vivienda ' + o.vivienda + ':\n\n«' + o.nombre + '»\n→ «' + _rdpsMay(p.nombre) + '»\n\n¿Continuar?')) return;
+      const n = _geRenombrarRegistros(o.vivienda, o.nombre, p.nombre);
+      _geCerrarVincular();
+      _lazyMantener();
+      _geRender();
+      toast(n ? '✅ ' + n + ' registro' + (n !== 1 ? 's' : '') + ' actualizado' + (n !== 1 ? 's' : '') + ': ahora dice' + (n !== 1 ? 'n' : '') + ' «' + _rdpsMay(p.nombre) + '»' : 'No había registros por cambiar', 'success', 4500);
+    }
+    // Botones de corrección de una tarjeta con sexo o edad sin especificar
+    function _geBotonesCorregir(o, i) {
+      if (o.sexo && o.edad != null) return '';
+      if (!o.catVivId) return '<span class="badge ge-b-x">⚠ Esta vivienda no está en el catálogo</span>';
+      return (o.catPerId ? '' : '<button type="button" class="ge-ojo ge-corregir" onclick="_geAbrirVincular(' + i + ')">🔗 Vincular nombre</button>') +
+        '<button type="button" class="ge-ojo ge-corregir" onclick="_geAbrirFamilia(' + i + ')">🏠 Abrir familia y corregir</button>';
+    }
+
+    function _geBuscarCambio() {
+      clearTimeout(_geBuscarT);
+      _geBuscarT = setTimeout(_geRenderLista, 180);
+    }
+    function _geBuscarLimpiar() {
+      const el = document.getElementById('ge-buscar');
+      if (el) { el.value = ''; el.focus(); }
+      clearTimeout(_geBuscarT);
+      _geRenderLista();
+    }
+
+    function _geSeleccionarGrupo(id) {
+      _geGrupoSel = id;
+      _geRender();
+    }
+
+    function _geRender() {
+      const lista = _geConstruir();
+      const visitasTotal = lista.reduce((n, o) => n + o.visitas, 0);
+      const multi = lista.filter(o => o.grupos.length > 1).length;
+
+      // Tabla resumen (cada fila se puede tocar para ver las personas de ese grupo)
+      const filas = GE_GRUPOS.map(g => ({ id: g.id, nombre: g.icono + ' ' + g.nombre, detalle: g.detalle, n: lista.filter(o => o.grupos.includes(g.id)).length }));
+      const extras = [
+        { id: 'menores',   nombre: '👶 Menores de 12 años',        detalle: 'no entran en estos grupos',                       n: lista.filter(_geEsMenor).length,   solo: true },
+        { id: 'faltasexo', nombre: '⚠️ Falta el sexo',             detalle: '18 a 59 años: no se puede ubicar en MEF ni adultos', n: lista.filter(_geFaltaSexo).length, solo: true },
+        { id: 'sinedad',   nombre: '⚠️ Sin edad',                  detalle: 'sin fecha de nacimiento ni edad en el registro',   n: lista.filter(_geSinEdad).length,   solo: true }
+      ].filter(e => e.n > 0);
+      const todas = filas.concat(extras);
+      let html = '<table class="ge-tabla"><thead><tr><th class="ge-c-n">N°</th><th>Grupo</th><th class="ge-c-p">Personas</th></tr></thead><tbody>';
+      todas.forEach((f, i) => {
+        html += `<tr class="ge-fila${_geGrupoSel === f.id ? ' sel' : ''}" onclick="_geSeleccionarGrupo('${f.id}')">` +
+          `<td class="ge-c-n">${i + 1}</td>` +
+          `<td><div class="ge-gnombre">${_geEsc(f.nombre)}</div><div class="ge-gdetalle">${_geEsc(f.detalle)}</div></td>` +
+          `<td class="ge-c-p">${f.n}</td></tr>`;
+      });
+      html += `<tr class="ge-fila ge-total${_geGrupoSel === 'todos' ? ' sel' : ''}" onclick="_geSeleccionarGrupo('todos')">` +
+        `<td class="ge-c-n">${todas.length + 1}</td><td><div class="ge-gnombre">👥 Total de personas visitadas</div><div class="ge-gdetalle">cada persona cuenta una sola vez</div></td>` +
+        `<td class="ge-c-p">${lista.length}</td></tr></tbody></table>`;
+      const tablaEl = document.getElementById('ge-tabla');
+      if (tablaEl) tablaEl.innerHTML = html;
+
+      const resEl = document.getElementById('ge-resumen');
+      if (resEl) {
+        resEl.textContent = `${lista.length} persona${lista.length !== 1 ? 's' : ''} visitada${lista.length !== 1 ? 's' : ''} · ${visitasTotal} visita${visitasTotal !== 1 ? 's' : ''}` +
+          (multi ? ` · ${multi} cuenta${multi !== 1 ? 'n' : ''} en más de un grupo` : '');
+      }
+
+      _geCache = { lista, todas };
+      _geRenderLista();
+    }
+
+    // Solo redibuja la lista de tarjetas (usa los datos ya calculados); es lo que se llama al buscar
+    // ── Carga por bloques (scroll infinito) para las listas largas ──
+    // Muestra los primeros LOTE elementos y, al acercarse al final, agrega el siguiente bloque.
+    let _lazyKeep = false;               // true = al redibujar conserva cuántos bloques ya se habían cargado
+    function _lazyMantener() { _lazyKeep = true; }
+    function _lazyRender(cont, items, fn, lote) {
+      lote = lote || 25;
+      if (cont._lazyObs) { cont._lazyObs.disconnect(); cont._lazyObs = null; }
+      let n = Math.min(items.length, (_lazyKeep && cont._lazyN) ? Math.max(cont._lazyN, lote) : lote);
+      _lazyKeep = false;
+      cont.innerHTML = items.slice(0, n).map((it, i) => fn(it, i)).join('');
+      cont._lazyN = n;
+      if (n >= items.length) return;
+      const s = document.createElement('div');
+      s.style.cssText = 'text-align:center;color:var(--muted);font-size:.78rem;padding:1rem 0';
+      s.textContent = 'Cargando más…';
+      cont.appendChild(s);
+      const obs = new IntersectionObserver((es) => {
+        if (!es[0].isIntersecting) return;
+        const sig = items.slice(n, n + lote);
+        s.insertAdjacentHTML('beforebegin', sig.map((it, i) => fn(it, n + i)).join(''));
+        n += sig.length;
+        cont._lazyN = n;
+        if (n >= items.length) { obs.disconnect(); s.remove(); cont._lazyObs = null; }
+        else { obs.unobserve(s); obs.observe(s); }   // vuelve a comprobar por si aún se ve el final
+      }, { rootMargin: '500px 0px' });
+      obs.observe(s);
+      cont._lazyObs = obs;
+    }
+
+    function _geRenderLista() {
+      if (!_geCache) { _geRender(); return; }
+      const { lista, todas } = _geCache;
+      const sel = _geGrupoSel;
+      const titulo = sel === 'todos' ? 'Todas las personas visitadas'
+        : (todas.find(f => f.id === sel) || { nombre: '' }).nombre.replace(/^\S+\s/, '');
+      const visGrupo = _geFiltrar(lista, sel);
+      const qEl = document.getElementById('ge-buscar');
+      const q = _geNorm(qEl ? qEl.value : '');
+      const vis = q ? visGrupo.filter(o => _geNorm(o.nombre).includes(q) || _geNorm(o.vivienda).includes(q)) : visGrupo;
+      _geVisibles = vis;
+      const xEl = document.getElementById('ge-buscar-x');
+      if (xEl) xEl.style.display = q ? 'block' : 'none';
+      const tEl = document.getElementById('ge-lista-titulo');
+      if (tEl) tEl.textContent = q ? `${titulo} (${vis.length} de ${visGrupo.length})` : `${titulo} (${vis.length})`;
+      const cont = document.getElementById('ge-lista');
+      if (!cont) return;
+      if (!vis.length) {
+        cont.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <h3>Sin resultados</h3>
+          <p>${q ? 'Ninguna persona coincide con «' + _geEsc(qEl.value.trim()) + '»' : 'No hay personas visitadas de este grupo en este período'}</p>
+        </div>`;
+        return;
+      }
+      const _tarjetaGe = (o, i) => {
+        const f = o.fecha.split('-').reverse().join('/');
+        const sexoB = o.sexo === 'F' ? '<span class="badge ge-b-f">♀ Femenino</span>'
+          : o.sexo === 'M' ? '<span class="badge ge-b-m">♂ Masculino</span>'
+          : '<span class="badge ge-b-x">⚠ Sin sexo registrado</span>';
+        const grupos = o.grupos.map(id => '<span class="badge badge-viv">' + _geEsc(GE_GRUPOS.find(g => g.id === id).corto) + '</span>').join('');
+        return `
+        <div class="record-card">
+          <div class="record-header">
+            <div style="flex:1;min-width:0">
+              <div class="record-name"><span class="ge-n">${i + 1}.</span> ${_geEsc(o.nombre)}</div>
+              <div class="record-meta">
+                ${o.edad != null ? `<span class="badge badge-hora">🎂 ${o.edad} año${o.edad !== 1 ? 's' : ''}</span>` : '<span class="badge ge-b-x">⚠ Sin edad</span>'}
+                ${sexoB}
+                ${o.vivienda ? `<span class="badge badge-viv">🏠 Viv. ${_geEsc(o.vivienda)}</span>` : ''}
+                <span class="badge badge-fecha">📅 ${f}</span>
+                ${o.visitas > 1 ? `<span class="badge badge-fecha">${o.visitas} visitas</span>` : ''}
+                ${grupos}
+                ${_geBotonesCorregir(o, i)}
+                ${o.fechas.length > 1 ? `<button type="button" class="ge-ojo" id="ge-ojo-${i}" onclick="_geToggleFechas(${i})">${_geAbiertos.has(o.key) ? '🙈 Ocultar fechas' : '👁 Ver fechas'}</button>` : ''}
+              </div>
+              ${o.fechas.length > 1 ? `<div class="ge-fechas" id="ge-fechas-${i}" style="${_geAbiertos.has(o.key) ? '' : 'display:none'}">
+                <div class="ge-fechas-t">Fechas de visita (${o.fechas.length})</div>
+                ${o.fechas.map((x, k) => `<div class="ge-fecha-fila"><span class="ge-fecha-n">${k + 1}</span> 📅 ${x.fecha.split('-').reverse().join('/')}${_geHoraTxt(x.hora) ? ' · 🕐 ' + _geHoraTxt(x.hora) : ''}</div>`).join('')}
+              </div>` : ''}
+            </div>
+          </div>
+        </div>`;
+      };
+      _lazyRender(cont, vis, _tarjetaGe);
+    }
+
+    // ════════════════════════════════════
     // CONTROL DE ENTREGAS (Referencias / Informes de Visita Domiciliar)
     // Lleva la cuenta de a quién ya se le generó una Referencia o un Informe, permite ver
     // esa ficha de nuevo (con los datos tal como quedaron la última vez) y dejar la firma
@@ -8701,7 +9921,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       if (!registros[idx].referenciaGeneradaEn) registros[idx].referenciaGeneradaEn = _ctrlMejorFechaEstimada(registros[idx]); // hora del registro diario de la visita, no la hora del sistema
       registros[idx].referenciaActualizadaEn = new Date().toISOString();
       registros[idx].actualizadoEn = registros[idx].referenciaActualizadaEn; // para que subirNube() detecte el cambio
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
     }
 
     // Igual que la anterior, pero para el Informe de Visita Domiciliar. Los nombres de los
@@ -8730,7 +9950,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       if (!registros[idx].informeGeneradoEn) registros[idx].informeGeneradoEn = _ctrlMejorFechaEstimada(registros[idx]); // hora del registro diario de la visita, no la hora del sistema
       registros[idx].informeActualizadoEn = new Date().toISOString();
       registros[idx].actualizadoEn = registros[idx].informeActualizadoEn; // para que subirNube() detecte el cambio
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
     }
 
     // Convierte un ISO datetime (que siempre se guarda en UTC, via toISOString) a
@@ -8753,23 +9973,37 @@ Notas (Acciones ya escritas): ${accion || '—'}
       _ctrlRenderLista();
     }
 
+    let _ctrlBuscarT = null;
+    function _ctrlBuscarCambio() {
+      clearTimeout(_ctrlBuscarT);
+      _ctrlBuscarT = setTimeout(_ctrlRenderLista, 180);
+    }
+    function _ctrlBuscarLimpiar() {
+      const el = document.getElementById('ctrl-buscar');
+      if (el) { el.value = ''; el.focus(); }
+      clearTimeout(_ctrlBuscarT);
+      _ctrlRenderLista();
+    }
+
     function _ctrlCambiarPeriodo(periodo) {
       _ctrlPeriodoActual = periodo;
-      ['hoy', 'dia', 'mes'].forEach((p) => {
+      ['hoy', 'dia', 'mes', 'anio'].forEach((p) => {
         const btn = document.getElementById('ctrl-periodo-' + p);
         if (btn) btn.classList.toggle('active', p === periodo);
       });
       const campoDia = document.getElementById('ctrl-campos-dia');
       const campoMes = document.getElementById('ctrl-campos-mes');
       if (campoDia) campoDia.style.display = (periodo === 'dia') ? '' : 'none';
-      if (campoMes) campoMes.style.display = (periodo === 'mes') ? '' : 'none';
+      if (campoMes) campoMes.style.display = (periodo === 'mes' || periodo === 'anio') ? '' : 'none';
+      const grupoMes = document.getElementById('ctrl-grupo-mes');
+      if (grupoMes) grupoMes.style.display = (periodo === 'mes') ? '' : 'none';
 
       const fechaEl = document.getElementById('ctrl-fecha');
       if (periodo === 'dia' && fechaEl && !fechaEl.value) fechaEl.value = hoy();
 
       const anioEl = document.getElementById('ctrl-anio');
       const mesEl  = document.getElementById('ctrl-mes');
-      if (periodo === 'mes') {
+      if (periodo === 'mes' || periodo === 'anio') {
         const ahora = new Date();
         if (anioEl && !anioEl.value) anioEl.value = ahora.getFullYear();
         if (mesEl  && !mesEl.value)  mesEl.value  = String(ahora.getMonth() + 1).padStart(2, '0');
@@ -8827,7 +10061,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
           cambios = true;
         }
       });
-      if (cambios) localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      if (cambios) _rdpsGuardarRegistrosLS();
     }
 
     function _ctrlMejorFechaEstimada(r) {
@@ -8843,11 +10077,13 @@ Notas (Acciones ya escritas): ${accion || '—'}
     function _ctrlRenderLista() {
       const campoCampos = (_ctrlTipoActual === 'referencia') ? 'referenciaCampos' : 'informeCampos';
 
-      let fechaObjetivo = null, mesObjetivo = null;
+      let fechaObjetivo = null, mesObjetivo = null, anioObjetivo = null;
       if (_ctrlPeriodoActual === 'hoy') {
         fechaObjetivo = hoy();
       } else if (_ctrlPeriodoActual === 'dia') {
         fechaObjetivo = document.getElementById('ctrl-fecha').value || hoy();
+      } else if (_ctrlPeriodoActual === 'anio') {
+        anioObjetivo = String(document.getElementById('ctrl-anio').value || new Date().getFullYear());
       } else {
         const ahora = new Date();
         const anio = document.getElementById('ctrl-anio').value || ahora.getFullYear();
@@ -8863,15 +10099,24 @@ Notas (Acciones ya escritas): ${accion || '—'}
         if (!r[campoCampos]) return false;
         const gen = _ctrlMejorFechaEstimada(r);
         const ymd = _ctrlFechaLocalYMD(gen);
+        if (anioObjetivo) return ymd.slice(0, 4) === anioObjetivo;
         return mesObjetivo ? (ymd.slice(0, 7) === mesObjetivo) : (ymd === fechaObjetivo);
       });
       lista.sort((a, b) => _ctrlMejorFechaEstimada(b).localeCompare(_ctrlMejorFechaEstimada(a)));
 
+      const totalPeriodo = lista.length;
+      const qEl = document.getElementById('ctrl-buscar');
+      const q = _geNorm(qEl ? qEl.value : '');
+      if (q) lista = lista.filter((r) => _geNorm(r.nombre).includes(q) || _geNorm(r.vivienda).includes(q));
+      const xEl = document.getElementById('ctrl-buscar-x');
+      if (xEl) xEl.style.display = q ? 'block' : 'none';
+
       const resumenEl = document.getElementById('ctrl-resumen');
       if (resumenEl) {
+        const cuenta = q ? `${lista.length} de ${totalPeriodo}` : `${lista.length}`;
         resumenEl.textContent = (_ctrlTipoActual === 'referencia')
-          ? `${lista.length} referencia${lista.length !== 1 ? 's' : ''} generada${lista.length !== 1 ? 's' : ''}`
-          : `${lista.length} informe${lista.length !== 1 ? 's' : ''} de visita generado${lista.length !== 1 ? 's' : ''}`;
+          ? `${cuenta} referencia${lista.length !== 1 ? 's' : ''} generada${lista.length !== 1 ? 's' : ''}`
+          : `${cuenta} informe${lista.length !== 1 ? 's' : ''} de visita generado${lista.length !== 1 ? 's' : ''}`;
       }
 
       const cont = document.getElementById('ctrl-lista');
@@ -8881,11 +10126,11 @@ Notas (Acciones ya escritas): ${accion || '—'}
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <h3>Sin resultados</h3>
-          <p>No se ha generado ninguna${_ctrlTipoActual === 'referencia' ? ' referencia' : ' informe'} en este período</p>
+          <p>${q ? 'Ninguna coincide con «' + _geEsc(qEl.value.trim()) + '»' : 'No se ha generado ninguna' + (_ctrlTipoActual === 'referencia' ? ' referencia' : ' informe') + ' en este período'}</p>
         </div>`;
         return;
       }
-      cont.innerHTML = lista.map((r) => _ctrlTarjeta(_ctrlTipoActual, r)).join('');
+      _lazyRender(cont, lista, (r) => _ctrlTarjeta(_ctrlTipoActual, r));
     }
 
     // Abre de nuevo, en el mismo visor que ya existe, la Referencia o el Informe tal como
@@ -9033,9 +10278,10 @@ Notas (Acciones ya escritas): ${accion || '—'}
       registros[idx][campo] = dataURL;
       registros[idx][campo + 'Fecha'] = new Date().toISOString();
       registros[idx].actualizadoEn = registros[idx][campo + 'Fecha']; // para que subirNube() detecte el cambio
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       toast('✅ Firma guardada');
       _ctrlCerrarFirma();
+      _lazyMantener();
       _ctrlRenderLista();
     }
 
@@ -9065,8 +10311,9 @@ Notas (Acciones ya escritas): ${accion || '—'}
         delete registros[idx].informeControlFirmaFecha;
       }
       registros[idx].actualizadoEn = new Date().toISOString(); // para que subirNube() detecte el cambio
-      localStorage.setItem('rdps_registros', JSON.stringify(registros));
+      _rdpsGuardarRegistrosLS();
       toast('🗑️ Se quitó del Control de Entregas');
+      _lazyMantener();
       _ctrlRenderLista();
     }
 
@@ -9237,12 +10484,12 @@ Notas (Acciones ya escritas): ${accion || '—'}
         rowsHTML += `
           <tr data-id="${r.id}">
             <td class="c-fecha" data-label="Fecha">${fmtFecha(r.fecha)}</td>
-            <td class="c-hora" data-label="Hora">${r.hora || ''}</td>
+            <td class="c-hora" data-label="Hora">${/^\d{2}:\d{2}/.test(r.hora || '') ? `<input type="time" class="hora-input" value="${r.hora.slice(0,5)}" aria-label="Hora de la visita">` : (r.hora || '')}</td>
             <td class="c-viv" data-label="Vivienda">${r.vivienda || ''}</td>
             <td class="c-nombre" data-label="Nombre">${r.nombre || ''}</td>
             <td class="c-edad" data-label="Edad">${r.edad || ''}</td>
-            <td class="c-hall c-editable" data-label="Hallazgos" contenteditable="true" spellcheck="false">${(r.hallazgos||'').replace(/\n/g,'<br>')}</td>
-            <td class="c-acc c-editable" data-label="Acciones" contenteditable="true" spellcheck="false">${(r.acciones||'').replace(/\n/g,'<br>')}</td>
+            <td class="c-hall c-editable" data-campo="hallazgos" data-label="Hallazgos" contenteditable="true" spellcheck="false">${(r.hallazgos||'').replace(/\n/g,'<br>')}</td>
+            <td class="c-acc c-editable" data-campo="acciones" data-label="Acciones" contenteditable="true" spellcheck="false">${(r.acciones||'').replace(/\n/g,'<br>')}</td>
           </tr>`;
       }
 
@@ -9331,6 +10578,10 @@ Notas (Acciones ya escritas): ${accion || '—'}
     .page-body { }
     /* ══ CELDAS EDITABLES ══ */
     @media screen {
+      .hora-input { width: 100%; box-sizing: border-box; border: 1px dashed transparent; background: transparent; font: inherit; color: inherit; text-align: center; padding: 2px 0; border-radius: 4px; }
+      .hora-input:hover { border-color: #0b8a72; background: rgba(11,138,114,0.06); }
+      .hora-input:focus { outline: 2px solid #0b8a72; background: #fff; }
+      .hora-input[data-modificado="true"] { background: #fef9c3; border-color: #eab308; }
       .c-editable {
         cursor: text;
         outline: none;
@@ -9410,6 +10661,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
     }
     @media print {
       .c-editable { cursor: default !important; }
+      .hora-input { border: none !important; background: transparent !important; outline: none !important; }
       .edit-hint, .ia-toolbar, .cambios-bar { display: none !important; }
     }
 
@@ -9656,6 +10908,13 @@ Notas (Acciones ya escritas): ${accion || '—'}
         <span id="btn-magic-tabla-texto">✨ Generar  Informe Profesional</span>
       </button>
       <span class="ia-nivel-wrap">
+        <label for="rep-estilo-ia">🗣️ Estilo:</label>
+        <select id="rep-estilo-ia" onchange="_repGuardarEstilo()">
+          <option value="tecnico" selected>🩺 Técnico profesional</option>
+          <option value="sencillo">🏘️ Técnico comunitario</option>
+        </select>
+      </span>
+      <span class="ia-nivel-wrap">
         <label for="rep-nivel-ia">🎛️ Nivel:</label>
         <select id="rep-nivel-ia">
           <option value="resumido">Resumido</option>
@@ -9718,20 +10977,28 @@ Notas (Acciones ya escritas): ${accion || '—'}
       var cambios = {};
       var originalData = {};
 
-      document.querySelectorAll('tr[data-id]').forEach(function(tr) {
-        var id = tr.getAttribute('data-id');
-        var celdas = tr.querySelectorAll('.c-editable');
-        originalData[id] = {
-          hallazgos: celdas[0] ? celdas[0].innerHTML : '',
-          acciones:  celdas[1] ? celdas[1].innerHTML : ''
-        };
-      });
-
       function htmlToText(html) {
         var div = document.createElement('div');
         div.innerHTML = html.replace(/<br[^>]*>/gi, ' ');
         return (div.textContent || div.innerText || '').trim();
       }
+
+      function leerFila(tr) {
+        var h = tr.querySelector('[data-campo="hallazgos"]');
+        var a = tr.querySelector('[data-campo="acciones"]');
+        var hi = tr.querySelector('.hora-input');
+        return {
+          hallazgosHTML: h ? h.innerHTML : '',
+          accionesHTML: a ? a.innerHTML : '',
+          hallazgos: h ? htmlToText(h.innerHTML) : '',
+          acciones: a ? htmlToText(a.innerHTML) : '',
+          hora: hi ? hi.value : ''
+        };
+      }
+
+      document.querySelectorAll('tr[data-id]').forEach(function(tr) {
+        originalData[tr.getAttribute('data-id')] = leerFila(tr);
+      });
 
       function actualizarBarra() {
         var n = Object.keys(cambios).length;
@@ -9745,24 +11012,30 @@ Notas (Acciones ya escritas): ${accion || '—'}
         }
       }
 
+      function evaluarFila(tr) {
+        var id = tr.getAttribute('data-id');
+        var act = leerFila(tr);
+        var orig = originalData[id] || {};
+        var horaNueva = act.hora || orig.hora || '';
+        var hallCambio = act.hallazgos !== orig.hallazgos;
+        var accCambio = act.acciones !== orig.acciones;
+        var horaCambio = horaNueva !== (orig.hora || '');
+        if (hallCambio || accCambio || horaCambio) {
+          cambios[id] = { hallazgos: act.hallazgos, acciones: act.acciones, hora: horaNueva };
+        } else {
+          delete cambios[id];
+        }
+        var hi = tr.querySelector('.hora-input');
+        if (hi) { if (horaCambio) hi.setAttribute('data-modificado', 'true'); else hi.removeAttribute('data-modificado'); }
+        actualizarBarra();
+      }
+
       document.querySelectorAll('.c-editable').forEach(function(td) {
         td.addEventListener('input', function() {
           var tr = td.closest('tr[data-id]');
           if (!tr) return;
-          var id = tr.getAttribute('data-id');
-          var celdas = tr.querySelectorAll('.c-editable');
-          var hall = celdas[0] ? htmlToText(celdas[0].innerHTML) : '';
-          var acc  = celdas[1] ? htmlToText(celdas[1].innerHTML) : '';
-          var orig = originalData[id] || {};
-          var hallOrig = htmlToText(orig.hallazgos || '');
-          var accOrig  = htmlToText(orig.acciones  || '');
-          if (hall !== hallOrig || acc !== accOrig) {
-            cambios[id] = { hallazgos: hall, acciones: acc };
-            td.setAttribute('data-modificado', 'true');
-          } else {
-            delete cambios[id];
-          }
-          actualizarBarra();
+          td.setAttribute('data-modificado', 'true');
+          evaluarFila(tr);
         });
 
         td.addEventListener('blur', function() {
@@ -9781,6 +11054,15 @@ Notas (Acciones ya escritas): ${accion || '—'}
         });
       });
 
+      document.querySelectorAll('.hora-input').forEach(function(inp) {
+        function alCambiar() {
+          var tr = inp.closest('tr[data-id]');
+          if (tr) evaluarFila(tr);
+        }
+        inp.addEventListener('input', alCambiar);
+        inp.addEventListener('change', alCambiar);
+      });
+
       document.getElementById('btn-guardar').addEventListener('click', function() {
         if (Object.keys(cambios).length === 0) return;
         try {
@@ -9788,10 +11070,8 @@ Notas (Acciones ya escritas): ${accion || '—'}
             var ok = window.parent.rdpsGuardarEdicion(cambios);
             if (ok) {
               document.querySelectorAll('tr[data-id]').forEach(function(tr) {
-                var id = tr.getAttribute('data-id');
-                var celdas = tr.querySelectorAll('.c-editable');
-                if (celdas[0]) { originalData[id] = { hallazgos: celdas[0].innerHTML, acciones: celdas[1] ? celdas[1].innerHTML : '' }; }
-                tr.querySelectorAll('.c-editable').forEach(function(c) { c.removeAttribute('data-modificado'); });
+                originalData[tr.getAttribute('data-id')] = leerFila(tr);
+                tr.querySelectorAll('.c-editable, .hora-input').forEach(function(c) { c.removeAttribute('data-modificado'); });
               });
               cambios = {};
               actualizarBarra();
@@ -9804,16 +11084,17 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
       document.getElementById('btn-descartar').addEventListener('click', function() {
         document.querySelectorAll('tr[data-id]').forEach(function(tr) {
-          var id = tr.getAttribute('data-id');
-          var celdas = tr.querySelectorAll('.c-editable');
-          var orig = originalData[id] || {};
-          if (celdas[0]) { celdas[0].innerHTML = orig.hallazgos || ''; celdas[0].removeAttribute('data-modificado'); }
-          if (celdas[1]) { celdas[1].innerHTML = orig.acciones  || ''; celdas[1].removeAttribute('data-modificado'); }
+          var orig = originalData[tr.getAttribute('data-id')] || {};
+          var h = tr.querySelector('[data-campo="hallazgos"]');
+          var a = tr.querySelector('[data-campo="acciones"]');
+          var hi = tr.querySelector('.hora-input');
+          if (h) { h.innerHTML = orig.hallazgosHTML || ''; h.removeAttribute('data-modificado'); }
+          if (a) { a.innerHTML = orig.accionesHTML || ''; a.removeAttribute('data-modificado'); }
+          if (hi) { hi.value = orig.hora || ''; hi.removeAttribute('data-modificado'); }
         });
         cambios = {};
         actualizarBarra();
       });
-
 
     })();
 
@@ -9952,6 +11233,29 @@ Notas (Acciones ya escritas): ${accion || '—'}
       'Se observó que', 'Durante la visita se encontró', 'La visita permitió constatar',
       'Se evaluó la condición de la persona y se determinó'
     ];
+    // Aperturas para el estilo "Técnico comunitario"
+    var _repAperturasHallazgosSencillo = [
+      'Se identificó que', 'Durante la visita se encontró que', 'Se verificó que', 'Se observó que',
+      'Al realizar la visita se constató que', 'Se encontró que'
+    ];
+    var _repAperturasAccionesSencillo = [
+      'Se brindó consejería sobre', 'Se orientó a la persona sobre', 'Se explicó la importancia de',
+      'Se reforzó la información sobre', 'Se recomendó', 'Se dio orientación sobre'
+    ];
+    function _repEstiloActual() {
+      var el = document.getElementById('rep-estilo-ia');
+      return (el && el.value === 'sencillo') ? 'sencillo' : 'tecnico';
+    }
+    function _repGuardarEstilo() {
+      try { localStorage.setItem('rdps_estilo_ia', _repEstiloActual()); } catch (e) {}
+    }
+    (function() {
+      try {
+        var el = document.getElementById('rep-estilo-ia');
+        if (el && localStorage.getItem('rdps_estilo_ia') === 'sencillo') el.value = 'sencillo';
+      } catch (e) {}
+    })();
+
     var _repAperturasAcciones = [
       'La persona recibió orientación sobre', 'Como parte de la atención se educó sobre',
       'Durante la visita se recomendó', 'Ante esta situación, se explicó',
@@ -9989,6 +11293,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
     function _repConstruirPromptLote(items, nivel, refuerzos) {
       var regla = _repReglaNivel(nivel);
+      var sencillo = !!(items[0] && items[0].estilo === 'sencillo');
       var hayRiesgoDetectado = false;
       var personas = items.map(function(it) {
         var ref = (refuerzos && refuerzos[it.idx]) ? (' [DEBES incluir textualmente estas cifras que faltaron antes: ' + refuerzos[it.idx].join(', ') + ']') : '';
@@ -10007,8 +11312,10 @@ Notas (Acciones ya escritas): ${accion || '—'}
         'Debes devolver EXACTAMENTE ' + items.length + ' filas, una por persona, respetando el número N° indicado para cada una (no lo cambies, no lo omitas, no reordenes).',
         'REGLAS PARA TODAS LAS FILAS:',
         '1. Edad: adultos y niños mayores con la palabra completa ("35 años"); bebés/niños pequeños con años y meses ("1 año 2 meses", "8 meses").',
+        sencillo ? '2. ESTILO: TÉCNICO EN SALUD COMUNITARIA (regla crítica, SUSTITUYE cualquier idea de redacción técnica formal): redacta con el registro profesional de un promotor o técnico de salud comunitaria que documenta su visita: lenguaje claro, preciso y ordenado, comprensible para el equipo de salud y la comunidad, pero SIN sonar coloquial, infantil ni simplista (sin diminutivos ni expresiones de plática). Usa pretérito simple y tercera persona; nunca paciente ni el equipo de salud. Usa con naturalidad los términos propios del primer nivel de atención, que NO se simplifican: hipertensión arterial, diabetes, control prenatal, signos de peligro, esquema de vacunación, lactancia materna, desnutrición, deshidratación, consejería, seguimiento, referencia al establecimiento de salud, usuario o usuaria, vivienda, grupo familiar. Solo reemplaza el vocabulario clínico especializado u hospitalario por su equivalente claro: sintomatología → síntomas; cefalea → dolor de cabeza; disnea → dificultad para respirar; edema → hinchazón; hiperglucemia → glucosa elevada; adherencia al tratamiento → cumplimiento del tratamiento; cuadro clínico → situación de salud. Si usas un término poco común, aclara brevemente entre paréntesis. Explica los riesgos de forma directa (ej. riesgo de complicaciones). Para el ACUERDO usa fórmulas como Acuerdo: ..., Se acordó que..., La persona se comprometió a..., Se estableció el compromiso de.... Solo cambia el REGISTRO del lenguaje, no el contenido: TODAS las demás reglas siguen vigentes y las cifras (140/90, kg, cm, semanas, fechas) se conservan exactas.' :
         '2. Redacción técnica formal (pretérito perfecto impersonal). Evita usar "paciente" como sustantivo por defecto (usa "la persona", "el usuario", "el señor"/"la señora", "el niño"/"la niña"). Nunca "el equipo de salud" ni "el personal de salud".',
         '3. INICIO FIJO POR PERSONA (no negociable): cada persona tiene asignado su propio inicio para Hallazgos y para Acciones (ver lista de personas abajo). Úsalo literalmente al comenzar esa columna para esa persona; distintas personas ya tienen distintos inicios asignados, así que el resultado tendrá variedad automáticamente.',
+        sencillo ? '3b. EVITA LA MULETILLA "que la persona se encuentra en...": ve directo al hallazgo (ej. Se encontró un embarazo de 32 semanas...) y nombra a la persona como máximo en UNA de las dos columnas de esa fila.' :
         '3b. EVITA LA MULETILLA "que la persona se encuentra en..." (regla crítica): no sigas el inicio asignado con esa misma frase en cada fila. En construcciones con "Se" (Se identificó, Se detectó, Se constató, etc.) el sujeto ya queda implícito gramaticalmente, así que casi siempre puedes ir directo al hallazgo sin nombrar a la persona (ej: "Se identificó un embarazo de 32 semanas..." en vez de "Se identificó que la persona se encuentra en estado de embarazo de 32 semanas..."). Usa una referencia explícita a la persona (la persona/la usuaria/el señor/la señora/el niño/la niña) como máximo en UNA de las dos columnas de esa fila, no en ambas.',
         '4. ' + regla.texto,
         '5. IDENTIFICACIÓN DE RIESGOS (regla importante): cuando el hallazgo lo permita, agrega el riesgo o posible complicación clínica directa asociada a lo encontrado (ej. hipertensión no controlada → riesgo de complicaciones cardiovasculares; diarrea con deshidratación en niño pequeño → riesgo de deshidratación severa; embarazo con hta → riesgo de preeclampsia). Este riesgo debe basarse SOLO en lo mencionado en la nota, sin inventar condiciones nuevas, y debe reflejarse en Hallazgos o como justificación de la Acción/consejería.',
@@ -10095,6 +11402,9 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
       var nivelSel = document.getElementById('rep-nivel-ia');
       var nivel = nivelSel ? nivelSel.value : 'balanceado';
+      var estilo = _repEstiloActual();
+      var _listaApH = estilo === 'sencillo' ? _repAperturasHallazgosSencillo : _repAperturasHallazgos;
+      var _listaApA = estilo === 'sencillo' ? _repAperturasAccionesSencillo : _repAperturasAcciones;
 
       var btn = document.getElementById('btn-magic-tabla');
       var btnTexto = document.getElementById('btn-magic-tabla-texto');
@@ -10140,8 +11450,9 @@ Notas (Acciones ya escritas): ${accion || '—'}
           edad: (celdaEdad ? celdaEdad.textContent : '').trim(),
           notasCompletas: notasCompletas,
           numerosOriginales: _repExtraerNumeros(notasCompletas),
-          aperturaHallazgos: _repAperturasHallazgos[refIdx % _repAperturasHallazgos.length],
-          aperturaAcciones: _repAperturasAcciones[refIdx % _repAperturasAcciones.length]
+          estilo: estilo,
+          aperturaHallazgos: _listaApH[refIdx % _listaApH.length],
+          aperturaAcciones: _listaApA[refIdx % _listaApA.length]
         });
         refIdx++;
       }
@@ -10315,11 +11626,13 @@ Notas (Acciones ya escritas): ${accion || '—'}
         const c = cambios[id];
         if (typeof c.hallazgos === 'string') registros[idx].hallazgos = c.hallazgos;
         if (typeof c.acciones  === 'string') registros[idx].acciones  = c.acciones;
+        if (typeof c.hora === 'string' && /^\d{2}:\d{2}$/.test(c.hora)) registros[idx].hora = c.hora;
         registros[idx].actualizadoEn = new Date().toISOString();
+        try { _vmSincronizarNota(registros[idx]); } catch (e) { console.warn('No se pudo sincronizar la nota:', e); }
         guardados++;
       });
       if (guardados > 0) {
-        localStorage.setItem('rdps_registros', JSON.stringify(registros));
+        _rdpsGuardarRegistrosLS();
         renderListado();
         actualizarHome();
         toast('✅ ' + guardados + ' registro' + (guardados > 1 ? 's' : '') + ' guardado' + (guardados > 1 ? 's' : ''), 'success');
@@ -10561,7 +11874,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
           });
           await batch.commit();
         }
-        localStorage.setItem('rdps_registros', JSON.stringify(registros));
+        _rdpsGuardarRegistrosLS();
 
         // ── Catálogo de familias (reusar famMetaCloud, sin segunda lectura) ──
         const catalogo = getCatalogo();
@@ -10728,7 +12041,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
         // Aplicar registros
         registros = Object.values(mergedReg).sort((a,b) =>
           (b.fecha||'').localeCompare(a.fecha||''));
-        localStorage.setItem('rdps_registros', JSON.stringify(registros));
+        _rdpsGuardarRegistrosLS();
 
         // Aplicar catálogo
         const catalogoFinal = Object.values(mergedFam);
@@ -10845,7 +12158,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
             <span class="cat-persona-ico">👤</span>
             <div class="cat-persona-info">
               <strong>${p.nombre}</strong>
-              <span>${edadViva ? '🎂 ' + edadViva : 'Sin edad'}${subtxt ? ' · ' + subtxt : ''}</span>
+              <span>${edadViva ? '🎂 ' + edadViva : 'Sin edad'}${subtxt ? ' · ' + subtxt : ''}${p.sexo === 'F' ? ' · ♀ Femenino' : (p.sexo === 'M' ? ' · ♂ Masculino' : '')}</span>
               ${esResultadoFiltrado ? `<span class="cat-ver-familia">🏠 Ver familia completa</span>` : ''}
             </div>
             ${!esResultadoFiltrado ? `
@@ -11049,6 +12362,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       document.getElementById('mcat-titulo').textContent    = `Agregar — Vivienda ${viv ? viv.vivienda : ''}`;
       document.getElementById('mcat-nombre').value          = '';
       document.getElementById('mcat-fnac').value            = '';
+      document.getElementById('mcat-sexo').value            = '';
       document.getElementById('mcat-edad-manual').value     = '';
       document.getElementById('mcat-edad-manual').placeholder = 'Ej: 32 años, 1 año 6 meses, 15 días…';
       document.getElementById('mcat-edad-display').style.display = 'none';
@@ -11087,7 +12401,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
         const viv = cat.find(v => v.id === _mcatVivId);
         if (!viv) return;
         if (!viv.personas) viv.personas = [];
-        viv.personas.push({ id: 'per_' + Date.now(), nombre, fnac: fnac || '', edad });
+        viv.personas.push({ id: 'per_' + Date.now(), nombre, fnac: fnac || '', edad, sexo: document.getElementById('mcat-sexo').value });
         viv.actualizadoEn = new Date().toISOString(); // marca cambio para sync
         saveCatalogo(cat);
         cerrarModalCat();
@@ -11313,6 +12627,33 @@ Notas (Acciones ya escritas): ${accion || '—'}
       el.style.display = 'block';
     }
 
+    // Plantilla de ejemplo: mismas columnas y ejemplos que la del Mapa Sanitario
+    function micatDescargarPlantilla() {
+      const filas = [
+        ['N° Vivienda', 'Nombre', 'Fecha Nacimiento (DD/MM/AAAA)', 'Riesgo (alto/medio/sin riesgo)', 'Sexo (Masculino/Femenino)'],
+        [1, 'María García', '15/03/1985', 'sin riesgo', 'Femenino'],
+        [1, 'Juan García', '22/07/1983', '', 'Masculino'],
+        [2, 'Ana López', '05/11/2002', 'medio', 'Femenino'],
+        [3, 'Pedro Martínez', '30/01/1960', 'alto', 'Masculino']
+      ];
+      _cargarXLSX(function (err) {
+        if (err || typeof XLSX === 'undefined') {
+          const csv = filas.map(r => r.join(',')).join('\n');
+          const a = document.createElement('a');
+          a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+          a.download = 'Plantilla_Catalogo.csv'; a.click();
+          toast('📥 Plantilla descargada (CSV)', 'success');
+          return;
+        }
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(filas);
+        ws['!cols'] = [{ wch: 14 }, { wch: 28 }, { wch: 28 }, { wch: 30 }, { wch: 28 }];
+        XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
+        XLSX.writeFile(wb, 'Plantilla_Catalogo.xlsx');
+        toast('📥 Plantilla descargada', 'success');
+      });
+    }
+
     function micatLeerArchivo(file) {
       if (!file) return;
       document.getElementById('micat-error').style.display = 'none';
@@ -11467,8 +12808,16 @@ Notas (Acciones ya escritas): ${accion || '—'}
       return s; // devolver tal cual si no reconoce
     }
 
+    // Sexo desde una celda: F/M, mujer/hombre, femenino/masculino, niña/niño → 'F' | 'M' | ''
+    function micatParseSexo(v) {
+      const t = String(v == null ? '' : v).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[.\s]+/g, '');
+      if (/^(f|fem\w*|mujer|nina|female)$/.test(t)) return 'F';
+      if (/^(m|mas\w*|hombre|varon|nino|male)$/.test(t)) return 'M';
+      return '';
+    }
+
     function micatProcesarFilas(filas) {
-      // Columnas: 0=vivienda, 1=nombre, 2=fecha nacimiento
+      // Columnas (igual que el Mapa Sanitario): 0=vivienda, 1=nombre, 2=fecha nacimiento, 3=riesgo (solo Mapa, aquí se ignora), 4=sexo (opcional)
       const procesadas = [];
       let errores = 0;
       let ultimaVivienda = ''; // propagar vivienda hacia abajo si la celda está vacía
@@ -11477,6 +12826,13 @@ Notas (Acciones ya escritas): ${accion || '—'}
         let   vivienda = String(cols[0] ?? '').trim();
         const nombre   = String(cols[1] ?? '').trim();
         let   fnacRaw  = String(cols[2] ?? '').trim();
+        // Sexo: columna E, como en el Mapa Sanitario (Riesgo = columna D, que aquí se ignora).
+        // Si la E está vacía y alguien puso el sexo en la D, también se acepta (solo si se entiende).
+        const sexoE = String(cols[4] ?? '').trim();
+        const sexoD = String(cols[3] ?? '').trim();
+        let sexoTxt = sexoE, sexo = micatParseSexo(sexoE);
+        if (!sexoE && sexoD) { const s2 = micatParseSexo(sexoD); if (s2) { sexo = s2; sexoTxt = sexoD; } }
+        const sexoNoReconocido = !!sexoE && !sexo;
 
         if (!vivienda && !nombre) return; // fila vacía → ignorar
 
@@ -11501,7 +12857,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
         // Normalizar fecha a ISO AAAA-MM-DD para almacenamiento uniforme
         fnacRaw = micatNormalizarISO(fnacRaw);
 
-        procesadas.push({ vivienda, nombre, fnac: fnacRaw, _err: !vivienda || !nombre });
+        procesadas.push({ vivienda, nombre, fnac: fnacRaw, sexo, sexoNoReconocido, sexoTxt, _err: !vivienda || !nombre });
       });
 
       if (!procesadas.length) {
@@ -11513,7 +12869,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
       // Renderizar vista previa
       const tbody = document.getElementById('micat-prev-tbody');
-      tbody.innerHTML = procesadas.map(f => {
+      tbody.innerHTML = procesadas.map((f, idx) => {
         const edadCalc = f.fnac ? micatCalcEdadSV(f.fnac) : null;
         let celdaFnac;
         if (f.fnac && edadCalc) {
@@ -11529,9 +12885,14 @@ Notas (Acciones ya escritas): ${accion || '—'}
           celdaFnac = `<td class="edad-calc" style="color:#9ca3af;font-size:.72rem">— sin fecha</td>`;
         }
         return `<tr>
+          <td style="text-align:right;color:#6b7280;font-weight:700">${idx + 1}</td>
           <td class="${f._err && !f.vivienda ? 'err' : ''}">${f.vivienda || '⚠ vacío'}</td>
           <td class="${f._err && !f.nombre   ? 'err' : ''}">${f.nombre   || '⚠ vacío'}</td>
           ${celdaFnac}
+          ${f.sexo === 'F' ? '<td style="font-weight:700;color:#c2185b">♀ Femenino</td>'
+            : f.sexo === 'M' ? '<td style="font-weight:700;color:#1565c0">♂ Masculino</td>'
+            : f.sexoNoReconocido ? `<td style="color:#c0392b;font-size:.72rem">⚠ «${String(f.sexoTxt).replace(/[<>&"]/g,'')}» no se entiende<br/><span style="color:#999">quedará sin sexo</span></td>`
+            : '<td style="font-weight:700;color:#aaa">—</td>'}
         </tr>`;
       }).join('');
 
@@ -11539,8 +12900,11 @@ Notas (Acciones ya escritas): ${accion || '—'}
 
       const vivUnicas = new Set(procesadas.filter(f => !f._err).map(f => f.vivienda)).size;
       const validas   = procesadas.filter(f => !f._err).length;
+      const conSexo = procesadas.filter(f => !f._err && f.sexo).length;
+      const sexoRaros = procesadas.filter(f => !f._err && f.sexoNoReconocido).length;
       document.getElementById('micat-resumen').textContent =
-        `${validas} personas en ${vivUnicas} vivienda${vivUnicas!==1?'s':''}` +
+        `${validas} personas en ${vivUnicas} vivienda${vivUnicas!==1?'s':''} · ${conSexo} con sexo` +
+        (sexoRaros ? ` · ⚠ ${sexoRaros} con sexo que no se entiende (quedarán sin sexo)` : '') +
         (errores ? ` · ⚠ ${errores} fila${errores>1?'s':''} con datos incompletos (se omitirán)` : ' ✓');
 
       document.getElementById('micat-reemplazar').checked = false;
@@ -11573,6 +12937,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       let cat = reemplazar ? [] : getCatalogo();
 
       // Agrupar filas por vivienda y fusionar
+      let sexoCompletado = 0;
       const tsImport = new Date().toISOString();
       filas.forEach(f => {
         let viv = cat.find(v => v.vivienda === f.vivienda);
@@ -11582,16 +12947,24 @@ Notas (Acciones ya escritas): ${accion || '—'}
           cat.push(viv);
         }
         // Evitar duplicar por nombre exacto
-        const yaExiste = viv.personas.some(
+        const existente = viv.personas.find(
           p => p.nombre.toLowerCase() === f.nombre.toLowerCase()
         );
+        const yaExiste = !!existente;
+        if (existente && f.sexo && !existente.sexo) {
+          // Ya estaba en el catálogo sin sexo: se completa (nunca se cambia un sexo ya guardado)
+          existente.sexo = f.sexo;
+          viv.actualizadoEn = tsImport;
+          sexoCompletado++;
+        }
         if (!yaExiste) {
           const edadFinal = f.fnac ? (micatCalcEdadSV(f.fnac) || '') : '';
           viv.personas.push({
             id:     'per_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
             nombre: f.nombre,
             edad:   edadFinal,
-            fnac:   f.fnac || ''
+            fnac:   f.fnac || '',
+            sexo:   f.sexo || ''
           });
           viv.actualizadoEn = tsImport; // marca vivienda como modificada
         }
@@ -11602,7 +12975,263 @@ Notas (Acciones ya escritas): ${accion || '—'}
       cerrarModalImportarCat();
 
       const vivCount = new Set(filas.map(f => f.vivienda)).size;
-      toast(`✅ ${filas.length} personas importadas en ${vivCount} viviendas`, 'success');
+      toast(`✅ ${filas.length} personas importadas en ${vivCount} viviendas` +
+            (sexoCompletado ? ` · sexo completado en ${sexoCompletado} ya existente(s)` : ''), 'success', 4200);
+    }
+
+    // ══════════════════════════════════════════
+    // IMPORTAR CATÁLOGO DESDE EL MAPA SANITARIO
+    // Lee 'mapa_san_catalogo' (viviendas → personas con nombre, fecha de nacimiento y
+    // sexo F/M) y lo une al catálogo de esta app. El SEXO queda guardado en cada persona
+    // del catálogo (campo `sexo`: 'F' | 'M' | '') y viaja a la nube con la vivienda.
+    //  • Persona nueva → se agrega con nombre, fecha de nacimiento, sexo y `origenMapa`.
+    //  • Persona que ya existe en RD (mismo nombre en la misma vivienda) → solo se
+    //    COMPLETAN los datos que le faltan (sexo / fecha de nacimiento). Nunca se
+    //    sobrescribe un dato que ya tenga RD.
+    // Solo funciona si ambas apps comparten almacenamiento (SIS Comunitario).
+    // ══════════════════════════════════════════
+    let _rmItems = [], _rmRes = {};
+
+    function _rmNorm(s) {
+      return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+    }
+    function _rmTok(s) {
+      return _rmNorm(s).replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(Boolean).sort().join(' ');
+    }
+    // 'AAAA-MM-DD' válida y no futura (hora de El Salvador), o '' si no se puede usar
+    function _rmFecha(v) {
+      const t = String(v || '').trim();
+      if (!t) return '';
+      let x, y, m, d;
+      if ((x = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) { y = +x[1]; m = +x[2]; d = +x[3]; }
+      else if ((x = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/))) { d = +x[1]; m = +x[2]; y = +x[3]; }
+      else return '';
+      const f = new Date(y, m - 1, d);
+      if (y < 1900 || f.getFullYear() !== y || f.getMonth() !== m - 1 || f.getDate() !== d) return '';
+      const iso = y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      const hoySV = new Date(Date.now() - 6 * 3600 * 1000).toISOString().slice(0, 10);
+      return iso > hoySV ? '' : iso;
+    }
+    function _rmLeerMapa() {
+      try {
+        const v = JSON.parse(localStorage.getItem('mapa_san_catalogo') || 'null');
+        return Array.isArray(v) ? v : null;
+      } catch (e) { return null; }
+    }
+    function _rmEsc(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function _rmId() { return Date.now() + '_' + Math.random().toString(36).slice(2, 6); }
+
+    function _rmConstruir() {
+      const mapa = _rmLeerMapa();
+      if (!mapa) return null;
+      const cat = getCatalogo();
+      const porViv = {}, porOrigen = {}, globalNomNac = {};
+      cat.forEach(v => {
+        porViv[String(v.vivienda)] = v;
+        (v.personas || []).forEach(p => {
+          if (p.origenMapa) porOrigen[p.origenMapa] = { viv: v, p };
+          const nac = _rmFecha(p.fnac);
+          if (nac) globalNomNac[_rmNorm(p.nombre) + '|' + nac] = { viv: v, p };
+        });
+      });
+      const res = { personas: 0, deshab: 0, sinViv: 0 };
+      const items = [], vistos = new Set();
+      mapa.forEach(mv => {
+        if (!mv) return;
+        if (mv.deshabitada) { res.deshab++; return; }
+        const numViv = String(mv.vivienda == null ? '' : mv.vivienda).trim();
+        if (!numViv) { res.sinViv++; return; }
+        const vivRD = porViv[numViv] || null;
+        (mv.personas || []).forEach(mp => {
+          const nombre = String(mp && mp.nombre || '').replace(/\s+/g, ' ').trim();
+          if (!nombre) return;
+          res.personas++;
+          const sexo = (mp.sexo === 'F' || mp.sexo === 'M') ? mp.sexo : '';
+          const nac = _rmFecha(mp.fnac);
+          const nk = _rmNorm(nombre), tk = _rmTok(nombre);
+          const it = { mp, numViv, nombre, nac, sexo, estado: 'nueva', motivo: '', match: null, cambios: [] };
+          // 1) ¿ya vinculada por id del Mapa, o con el mismo nombre en la misma vivienda?
+          let m = (mp.id && porOrigen[mp.id]) ? porOrigen[mp.id].p : null;
+          let mViv = (mp.id && porOrigen[mp.id]) ? porOrigen[mp.id].viv : null;
+          if (!m && vivRD) {
+            m = (vivRD.personas || []).find(p => _rmNorm(p.nombre) === nk) || null;
+            if (m) mViv = vivRD;
+          }
+          const dupKey = numViv + '|' + nk;
+          if (vistos.has(dupKey)) { it.estado = 'repetida'; it.motivo = 'Aparece más de una vez en el Mapa'; }
+          else if (m) {
+            if (sexo && m.sexo && m.sexo !== sexo) {
+              it.estado = 'conflicto';
+              it.motivo = 'RD dice ' + (m.sexo === 'F' ? 'femenino' : 'masculino') + ' y el Mapa dice ' + (sexo === 'F' ? 'femenino' : 'masculino') + ': corrígelo a mano';
+            } else {
+              if (sexo && !m.sexo) it.cambios.push('sexo');
+              if (nac && !m.fnac) it.cambios.push('fecha de nacimiento');
+              if (it.cambios.length) { it.estado = 'completar'; it.motivo = 'Se completa: ' + it.cambios.join(' y '); }
+              else { it.estado = 'igual'; it.motivo = 'Ya está completa en RD'; }
+            }
+            it.match = { vivId: mViv.id, perId: m.id };
+          } else {
+            // 2) sin coincidencia exacta: avisar si parece la misma persona (otro orden de palabras o misma fecha en otra vivienda)
+            const otroOrden = vivRD && (vivRD.personas || []).find(p => _rmTok(p.nombre) === tk);
+            const enOtraViv = nac && globalNomNac[nk + '|' + nac];
+            if (otroOrden) { it.estado = 'posible'; it.motivo = 'Parece ser «' + otroOrden.nombre + '» (otro orden del nombre)'; }
+            else if (enOtraViv) { it.estado = 'posible'; it.motivo = 'Mismo nombre y fecha en la vivienda ' + enOtraViv.viv.vivienda; }
+          }
+          if (it.estado !== 'repetida') vistos.add(dupKey);
+          it.vivNueva = !vivRD;
+          items.push(it);
+        });
+      });
+      items.sort((a, b) => {
+        const na = parseFloat(a.numViv), nb = parseFloat(b.numViv);
+        if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+        if (a.numViv !== b.numViv) return a.numViv.localeCompare(b.numViv, 'es', { numeric: true });
+        return a.nombre.localeCompare(b.nombre, 'es');
+      });
+      _rmRes = res;
+      return items;
+    }
+
+    function rmAbrir() {
+      const items = _rmConstruir();
+      const list = document.getElementById('rm-list');
+      document.getElementById('rm-buscar').value = '';
+      if (!items) {
+        _rmItems = [];
+        document.getElementById('rm-sub').textContent = '';
+        document.getElementById('rm-tools').style.display = 'none';
+        document.getElementById('rm-go').style.display = 'none';
+        document.getElementById('rm-count').textContent = '';
+        list.innerHTML = '<div class="rm-empty"><b>No se encontraron datos del Mapa Sanitario</b> en este almacenamiento.<br>Esta opción funciona cuando el Mapa Sanitario y Registro Diario se abren dentro de SIS Comunitario (comparten el mismo almacenamiento).</div>';
+        document.getElementById('modal-mapa-import').classList.add('show');
+        return;
+      }
+      _rmItems = items;
+      document.getElementById('rm-tools').style.display = '';
+      document.getElementById('rm-go').style.display = '';
+      rmRender();
+      document.getElementById('modal-mapa-import').classList.add('show');
+    }
+    function rmCerrar() { document.getElementById('modal-mapa-import').classList.remove('show'); }
+
+    function rmRender() {
+      const list = document.getElementById('rm-list');
+      const n = e => _rmItems.filter(i => i.estado === e).length;
+      const sinSexo = _rmItems.filter(i => !i.sexo).length;
+      document.getElementById('rm-sub').textContent =
+        'Mapa Sanitario: ' + _rmRes.personas + ' persona(s) · ' + n('nueva') + ' nueva(s) · ' + n('completar') +
+        ' por completar (sexo o fecha) · ' + n('igual') + ' ya completas · ' + sinSexo + ' sin sexo en el Mapa' +
+        (n('conflicto') ? ' · ' + n('conflicto') + ' con sexo distinto' : '') +
+        (_rmRes.deshab ? ' · ' + _rmRes.deshab + ' vivienda(s) deshabitada(s) omitida(s)' : '') + '.';
+      list.innerHTML = _rmItems.length
+        ? _rmItems.map((it, ix) => _rmFila(it, ix)).join('')
+        : '<div class="rm-empty">El Mapa Sanitario no tiene personas registradas.</div>';
+      document.getElementById('rm-go').style.display = _rmItems.length ? '' : 'none';
+      rmFiltrar();
+    }
+
+    function _rmFila(it, ix) {
+      const accionable = it.estado === 'nueva' || it.estado === 'completar' || it.estado === 'posible';
+      const marcada = it.estado === 'nueva' || it.estado === 'completar';
+      const b = [];
+      if (it.estado === 'nueva') b.push('<span class="rm-b ok">Nueva' + (it.vivNueva ? ' · vivienda nueva' : '') + '</span>');
+      if (it.estado === 'completar') b.push('<span class="rm-b ok">' + _rmEsc(it.motivo) + '</span>');
+      if (it.estado === 'igual') b.push('<span class="rm-b">' + _rmEsc(it.motivo) + '</span>');
+      if (it.estado === 'posible' || it.estado === 'repetida') b.push('<span class="rm-b warn">' + _rmEsc(it.motivo) + '</span>');
+      if (it.estado === 'conflicto') b.push('<span class="rm-b no">' + _rmEsc(it.motivo) + '</span>');
+      if (it.sexo === 'F') b.push('<span class="rm-b ok">♀ Femenino</span>');
+      else if (it.sexo === 'M') b.push('<span class="rm-b ok">♂ Masculino</span>');
+      else b.push('<span class="rm-b warn">Sin sexo en el Mapa</span>');
+      const edad = it.nac ? calcularEdadTexto(it.nac) : (it.mp.edad || '');
+      const meta = 'Viv. ' + _rmEsc(it.numViv) + (edad ? ' · ' + _rmEsc(edad) : '') +
+        (it.nac ? ' · nac. ' + it.nac.split('-').reverse().join('/') : '');
+      return '<div class="rm-row' + (accionable ? '' : ' dis') + '" data-ix="' + ix + '" data-q="' + _rmEsc(_rmNorm(it.nombre) + ' ' + _rmNorm(it.numViv)) + '">' +
+        '<span class="rm-n">' + (ix + 1) + '</span>' +
+        '<input type="checkbox" class="rm-chk" ' + (marcada ? 'checked' : '') + ' ' + (accionable ? '' : 'disabled') + ' onchange="rmConteo()">' +
+        '<div class="rm-main"><div class="rm-name">' + _rmEsc(it.nombre) + '</div>' +
+        '<div class="rm-meta">' + meta + '</div>' +
+        '<div class="rm-badges">' + b.join('') + '</div></div></div>';
+    }
+
+    function rmConteo() {
+      const n = [...document.querySelectorAll('#rm-list .rm-row')]
+        .filter(r => r.style.display !== 'none' && r.querySelector('.rm-chk:checked')).length;
+      document.getElementById('rm-count').textContent = n ? n + ' seleccionada(s)' : '';
+      document.getElementById('rm-go').textContent = n ? 'Importar (' + n + ')' : 'Importar';
+    }
+    function rmFiltrar() {
+      const q = _rmNorm(document.getElementById('rm-buscar').value);
+      document.querySelectorAll('#rm-list .rm-row').forEach(r => {
+        r.style.display = (!q || (r.dataset.q || '').indexOf(q) > -1) ? '' : 'none';
+      });
+      rmConteo();
+    }
+    function rmMarcar(modo) {
+      document.querySelectorAll('#rm-list .rm-row').forEach(r => {
+        const it = _rmItems[+r.dataset.ix], c = r.querySelector('.rm-chk');
+        if (!c || c.disabled || r.style.display === 'none') return;
+        c.checked = modo === 'todas' && (it.estado === 'nueva' || it.estado === 'completar');
+      });
+      rmConteo();
+    }
+
+    function rmImportar() {
+      const filas = [...document.querySelectorAll('#rm-list .rm-row')]
+        .filter(r => r.style.display !== 'none' && r.querySelector('.rm-chk') && r.querySelector('.rm-chk').checked);
+      if (!filas.length) { toast('Selecciona al menos una persona', 'error'); return; }
+      const cat = getCatalogo();
+      const ts = new Date().toISOString();
+      let nuevas = 0, completadas = 0, vivNuevas = 0, omitidas = 0;
+      filas.forEach(fila => {
+        const it = _rmItems[+fila.dataset.ix];
+        if (!it) return;
+        if (it.estado === 'completar') {
+          const viv = cat.find(v => v.id === it.match.vivId);
+          const p = viv && (viv.personas || []).find(x => x.id === it.match.perId);
+          if (!p) { omitidas++; return; }
+          let cambio = false;
+          // Solo se rellenan datos vacíos: lo que ya tiene RD no se toca
+          if (it.sexo && !p.sexo) { p.sexo = it.sexo; cambio = true; }
+          if (it.nac && !p.fnac) { p.fnac = it.nac; p.edad = micatCalcEdadSV(it.nac) || p.edad || ''; cambio = true; }
+          if (!p.origenMapa && it.mp.id) p.origenMapa = it.mp.id;
+          if (cambio) { viv.actualizadoEn = ts; completadas++; } else omitidas++;
+        } else if (it.estado === 'nueva' || it.estado === 'posible') {
+          let viv = cat.find(v => String(v.vivienda) === it.numViv);
+          if (!viv) {
+            viv = { id: 'viv_' + _rmId(), vivienda: it.numViv, personas: [], actualizadoEn: ts };
+            cat.push(viv); vivNuevas++;
+          }
+          if (!viv.personas) viv.personas = [];
+          // Red de seguridad: nunca se duplica el mismo nombre dentro de la vivienda
+          if (viv.personas.some(x => _rmNorm(x.nombre) === _rmNorm(it.nombre))) { omitidas++; return; }
+          viv.personas.push({
+            id: 'per_' + _rmId(),
+            nombre: it.nombre,
+            edad: it.nac ? (micatCalcEdadSV(it.nac) || '') : (it.mp.edad || ''),
+            fnac: it.nac || '',
+            sexo: it.sexo,
+            origenMapa: it.mp.id || ''
+          });
+          viv.actualizadoEn = ts; // marca la vivienda como modificada para la sincronización
+          nuevas++;
+        }
+      });
+      try { saveCatalogo(cat); }
+      catch (e) {
+        // si el almacenamiento está lleno, setItem falla y el catálogo guardado queda intacto
+        alert('❌ No se pudo importar: se llenó el espacio de almacenamiento del dispositivo. No se cambió nada del catálogo.');
+        return;
+      }
+      rmCerrar();
+      renderCatalogo();
+      const partes = [];
+      if (nuevas) partes.push(nuevas + ' nueva(s)');
+      if (completadas) partes.push(completadas + ' completada(s)');
+      if (vivNuevas) partes.push(vivNuevas + ' vivienda(s) nueva(s)');
+      if (omitidas) partes.push(omitidas + ' omitida(s)');
+      toast('✅ Mapa Sanitario: ' + (partes.join(' · ') || 'sin cambios'), 'success', 4200);
     }
 
     // ══════════════════════════════════════════
@@ -11742,7 +13371,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
           <span class="cat-persona-ico">👤</span>
           <div class="cat-persona-info">
             <strong>${p.nombre}</strong>
-            <span>${edadViva ? '🎂 ' + edadViva : 'Sin edad'}${subtxt ? ' · ' + subtxt : ''}</span>
+            <span>${edadViva ? '🎂 ' + edadViva : 'Sin edad'}${subtxt ? ' · ' + subtxt : ''}${p.sexo === 'F' ? ' · ♀ Femenino' : (p.sexo === 'M' ? ' · ♂ Masculino' : '')}</span>
           </div>
           <button class="cat-per-atender" onclick="cerrarModalEditarFamilia();cerrarModalListaViv();atenderFamiliaPersona('${viv.id}','${p.id}')" title="Atender a esta persona">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -11850,7 +13479,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
             else fnacDisplay = p.fnac;
           }
           const edad = p ? ((p.fnac ? calcularEdadTexto(p.fnac) : '') || p.edad || '') : '';
-          filas.push([viv.vivienda, p ? (p.nombre || '') : '', fnacDisplay, edad]);
+          filas.push([viv.vivienda, p ? (p.nombre || '') : '', fnacDisplay, edad, p ? (p.sexo === 'F' ? 'Femenino' : (p.sexo === 'M' ? 'Masculino' : '')) : '']);
         });
       });
       return filas;
@@ -11860,7 +13489,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
     function copiarCatalogoTabla() {
       const filas = _catFilas();
       if (!filas) { toast('El catálogo está vacío', 'error'); return; }
-      const cabecera = ['N° Vivienda', 'Nombre', 'Fecha de Nacimiento', 'Edad'];
+      const cabecera = ['N° Vivienda', 'Nombre', 'Fecha de Nacimiento', 'Edad', 'Sexo'];
       const tsv = [cabecera, ...filas].map(row => row.join('\t')).join('\n');
       navigator.clipboard.writeText(tsv).then(() => {
         const btn = document.getElementById('btn-copy-cat');
@@ -11905,7 +13534,9 @@ Notas (Acciones ya escritas): ${accion || '—'}
       abrirEditPersona, cerrarEditPersona, mepCalcularEdad, guardarEditPersona,
       // Importar catálogo
       abrirModalImportarCat, cerrarModalImportarCat, micatVolverPaso1,
-      micatOnDrop, micatLeerArchivo, micatConfirmarImport,
+      micatOnDrop, micatLeerArchivo, micatConfirmarImport, micatDescargarPlantilla,
+      // Importar catálogo desde el Mapa Sanitario (con sexo)
+      rmAbrir, rmCerrar, rmFiltrar, rmMarcar, rmConteo, rmImportar,
       // Selector de paciente
       abrirSelectorPac, cerrarSelectorPac, renderSelectorPac,
       seleccionarPaciente, seleccionarSinCatalogo, limpiarPacSeleccionado,
@@ -11918,10 +13549,14 @@ Notas (Acciones ya escritas): ${accion || '—'}
       _infGenerarObjetivoIA, _infGuardarFirmaRegistro, _infGuardarCampoRegistro,
       // Referencia Comunitaria (MINSAL)
       abrirReferenciaMINSAL, cerrarReferenciaMINSAL, imprimirReferenciaMINSAL,
-      _refGuardarCampoRegistro, _refGenerarReferenciaIA,
+      convertirReferenciaAMayusculas, _refGuardarCampoRegistro, _refGenerarReferenciaIA,
       // Control de Entregas (Referencias / Informes)
       _ctrlCambiarTipo, _ctrlCambiarPeriodo, _ctrlRenderLista, _ctrlVerFicha,
-      _ctrlAbrirFirma, _ctrlCerrarFirma, _ctrlLimpiarFirma, _ctrlGuardarFirma, _ctrlEliminarEntrada
+      _ctrlAbrirFirma, _ctrlCerrarFirma, _ctrlLimpiarFirma, _ctrlGuardarFirma, _ctrlEliminarEntrada,
+      // Seguimiento por grupos etarios
+      _geBuscarCambio, _geBuscarLimpiar, _ctrlBuscarCambio, _ctrlBuscarLimpiar,
+      _geCambiarPeriodo, _geSeleccionarGrupo, _geRender, _geToggleFechas, _geAbrirFamilia,
+      _geAbrirVincular, _geCerrarVincular, _geVincular
     });
 
     // ══════════════════════════════════════════
@@ -11939,6 +13574,7 @@ Notas (Acciones ya escritas): ${accion || '—'}
       document.getElementById('mep-titulo').textContent = 'Editar — Vivienda ' + viv.vivienda;
       document.getElementById('mep-nombre').value = p.nombre || '';
       document.getElementById('mep-fnac').value = p.fnac || '';
+      document.getElementById('mep-sexo').value = (p.sexo === 'F' || p.sexo === 'M') ? p.sexo : '';
       // Edad manual: si no tiene fnac, mostrar edad guardada
       document.getElementById('mep-edad-manual').value = (!p.fnac && p.edad) ? p.edad : '';
       document.getElementById('mep-edad-manual').placeholder = 'Ej: 32 años, 1 año 6 meses…';
@@ -11982,14 +13618,18 @@ Notas (Acciones ya escritas): ${accion || '—'}
       if (!viv) return;
       const p = (viv.personas || []).find(x => x.id === _mepPerId);
       if (!p) return;
+      const nombreAnterior = p.nombre || '';
       p.nombre = nombre;
       p.fnac   = fnac || '';
       p.edad   = edad;
+      p.sexo   = document.getElementById('mep-sexo').value;
       viv.actualizadoEn = new Date().toISOString();
       saveCatalogo(cat);
       renderCatalogo();
       cerrarEditPersona();
-      toast('✏️ ' + nombre + ' actualizado/a', 'success');
+      // Si se corrigió el nombre, los registros de esa persona pasan a llamarse igual
+      const nReg = (nombreAnterior && nombre !== nombreAnterior) ? _geRenombrarRegistros(viv.vivienda, nombreAnterior, nombre) : 0;
+      toast('✏️ ' + nombre + ' actualizado/a' + (nReg ? ' · ' + nReg + ' registro' + (nReg !== 1 ? 's' : '') + ' con el nombre corregido' : ''), 'success', nReg ? 4200 : 2800);
     }
 
     // ══════════════════════════════════════════
@@ -12011,5 +13651,160 @@ Notas (Acciones ya escritas): ${accion || '—'}
     });
 
 </script>
+
+<!-- ══════ Menú flotante de navegación entre apps (SIS Comunitario) ══════ -->
+<style>
+  .sisnav-backdrop{position:fixed;inset:0;z-index:99989;display:none;}
+  .sisnav-backdrop.sisnav-abierto{display:block;}
+  .sisnav-fab{position:fixed;right:12px;bottom:12px;z-index:99990;width:42px;height:42px;
+    border-radius:50%;background:rgba(22,26,34,.88);backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:transform .15s ease;-webkit-tap-highlight-color:transparent;cursor:grab;touch-action:none;user-select:none;}
+  .sisnav-fab:active{transform:scale(.9);cursor:grabbing;}
+  .sisnav-dots{display:grid;grid-template-columns:repeat(3,4px);grid-template-rows:repeat(3,4px);gap:3px;}
+  .sisnav-dots span{width:4px;height:4px;border-radius:50%;background:#fff;display:block;}
+  .sisnav-menu{position:fixed;right:12px;bottom:60px;z-index:99991;min-width:216px;max-width:260px;
+    background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.24);
+    border:1px solid rgba(0,0,0,.06);padding:6px;opacity:0;transform:translateY(10px) scale(.96);
+    pointer-events:none;transition:opacity .15s ease,transform .15s ease;max-height:70vh;overflow-y:auto;}
+  .sisnav-menu.sisnav-abierto{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+  .sisnav-titulo{font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;
+    color:#8a94a3;padding:8px 10px 5px;}
+  .sisnav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;
+    text-decoration:none;color:#1b2430;font-size:.85rem;font-weight:600;transition:background .1s;}
+  .sisnav-item:active{background:#eef1f5;}
+  @media (hover:hover){.sisnav-item:hover{background:#f1f3f6;}}
+  .sisnav-item .sisnav-ic{font-size:1.05rem;width:22px;text-align:center;flex-shrink:0;}
+</style>
+<div class="sisnav-backdrop" id="sisnavBackdrop" onclick="sisnavCerrar()"></div>
+<button class="sisnav-fab" id="sisnavBtn" onclick="sisnavToggle()" title="Otras aplicaciones (mantén presionado para moverlo, doble clic para restaurar)" aria-label="Ver otras aplicaciones">
+  <div class="sisnav-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</button>
+<div class="sisnav-menu" id="sisnavMenu">
+  <div class="sisnav-titulo">Aplicaciones</div>
+  <a class="sisnav-item" href="index.html"><span class="sisnav-ic">🏠</span>Inicio</a>
+  <a class="sisnav-item" href="Vigilancia_Materna.html"><span class="sisnav-ic">👩‍⚕️</span>Vigilancia Materna</a>
+  <a class="sisnav-item" href="calculadora_materna.html"><span class="sisnav-ic">🗓️</span>Calculadora Materna</a>
+  <a class="sisnav-item" href="mef.html"><span class="sisnav-ic">📋</span>Control MEF</a>
+  <a class="sisnav-item" href="visita_domiciliar.html"><span class="sisnav-ic">🩺</span>Hoja de Visita Domiciliar</a>
+  <a class="sisnav-item" href="MapaSanitario.html"><span class="sisnav-ic">🗺️</span>Mapa Sanitario</a>
+  <a class="sisnav-item" href="CurvasdeCrecimiento.html"><span class="sisnav-ic">📈</span>Curvas de Crecimiento</a>
+</div>
+<script type="text/x-deferred">
+(function(){
+  var btn = document.getElementById('sisnavBtn');
+  var menu = document.getElementById('sisnavMenu');
+  var backdrop = document.getElementById('sisnavBackdrop');
+  var STORAGE_KEY = 'sisnav_pos::' + (location.pathname.split('/').pop() || 'app');
+  var dragging = false, moved = false, justDragged = false, customized = false;
+  var startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  function clamp(v, min, max){ return Math.min(Math.max(v, min), max); }
+
+  function setPos(left, top){
+    var w = btn.offsetWidth || 42, h = btn.offsetHeight || 42;
+    left = clamp(left, 6, window.innerWidth - w - 6);
+    top  = clamp(top, 6, window.innerHeight - h - 6);
+    btn.style.left = left + 'px';
+    btn.style.top = top + 'px';
+    btn.style.right = 'auto';
+    btn.style.bottom = 'auto';
+  }
+
+  function savePos(){
+    var r = btn.getBoundingClientRect();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({x:r.left, y:r.top})); }catch(e){}
+  }
+
+  function loadPos(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      var p = JSON.parse(raw);
+      if(typeof p.x === 'number' && typeof p.y === 'number'){ setPos(p.x, p.y); return true; }
+    }catch(e){}
+    return false;
+  }
+
+  function resetPos(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    btn.style.left = ''; btn.style.top = ''; btn.style.right = ''; btn.style.bottom = '';
+    customized = false;
+  }
+
+  function posMenu(){
+    var r = btn.getBoundingClientRect();
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var mw = menu.offsetWidth || 230, mh = menu.offsetHeight || 260;
+    var left = r.left, top = r.bottom + 8;
+    if(left + mw > vw - 8) left = Math.max(8, r.right - mw);
+    if(left < 8) left = 8;
+    if(top + mh > vh - 8) top = Math.max(8, r.top - mh - 8);
+    if(top < 8) top = 8;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.style.right = 'auto';
+    menu.style.bottom = 'auto';
+  }
+
+  window.sisnavToggle = function(){
+    if(justDragged){ justDragged = false; return; }
+    var abrir = !menu.classList.contains('sisnav-abierto');
+    if(abrir) posMenu();
+    menu.classList.toggle('sisnav-abierto', abrir);
+    backdrop.classList.toggle('sisnav-abierto', abrir);
+  };
+  window.sisnavCerrar = function(){
+    menu.classList.remove('sisnav-abierto');
+    backdrop.classList.remove('sisnav-abierto');
+  };
+
+  function onDown(e){
+    var pt = e.touches ? e.touches[0] : e;
+    dragging = true; moved = false;
+    var r = btn.getBoundingClientRect();
+    startX = pt.clientX; startY = pt.clientY;
+    startLeft = r.left; startTop = r.top;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend', onUp);
+  }
+  function onMove(e){
+    if(!dragging) return;
+    var pt = e.touches ? e.touches[0] : e;
+    var dx = pt.clientX - startX, dy = pt.clientY - startY;
+    if(Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+    if(moved){
+      if(e.cancelable) e.preventDefault();
+      setPos(startLeft + dx, startTop + dy);
+      if(menu.classList.contains('sisnav-abierto')) window.sisnavCerrar();
+    }
+  }
+  function onUp(){
+    dragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    if(moved){ savePos(); justDragged = true; customized = true; }
+    moved = false;
+  }
+
+  btn.addEventListener('mousedown', onDown);
+  btn.addEventListener('touchstart', onDown, {passive:true});
+  btn.addEventListener('dblclick', function(e){ e.preventDefault(); resetPos(); });
+
+  window.addEventListener('resize', function(){
+    if(!customized) return;
+    var r = btn.getBoundingClientRect();
+    setPos(r.left, r.top);
+  });
+
+  customized = loadPos();
+})();
+</script>
+
 </body>
 </html>

@@ -1,78 +1,81 @@
-// ═══════════════════════════════════════════════════════
-//  Service Worker — Registro Diario Promotor de Salud
-//  Estrategia: Cache-First para assets, Network-First para datos
-// ═══════════════════════════════════════════════════════
+// ── SIS Comunitario Service Worker ──
+// Cambia el número de versión para forzar actualización del caché
+const CACHE_NAME = 'sis-comunitario-v6';
 
-const CACHE_NAME = 'registro-promotor-v14';
-
-// Archivos a cachear al instalar
+// Archivos a guardar en caché al instalar
 const PRECACHE_URLS = [
-  './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  // CDN externas (se cachean en runtime)
-  'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  './Vigilancia_Materna.html',
+  './calculadora_materna.html',
+  './mef.html',
+  './visita_domiciliar.html',
+  './MapaSanitario.html',
+  './CurvasdeCrecimiento.html',
+  './storage-shim.js'
 ];
 
-// ── INSTALL: precachear todo ──────────────────────────
+// ── INSTALL: pre-cachear todos los archivos core ──
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return Promise.allSettled(
-        PRECACHE_URLS.map(url =>
-          cache.add(url).catch(err => console.warn('[SW] No se pudo cachear:', url, err))
-        )
-      );
+      console.log('[SW] Pre-cacheando archivos...');
+      return cache.addAll(PRECACHE_URLS);
     }).then(() => self.skipWaiting())
   );
 });
 
-// ── ACTIVATE: limpiar caches viejos ──────────────────
+// ── ACTIVATE: eliminar cachés antiguas ──
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => {
+            console.log('[SW] Eliminando caché antigua:', key);
+            return caches.delete(key);
+          })
       )
     ).then(() => self.clients.claim())
   );
 });
 
-// ── FETCH: Cache-First con fallback a red ─────────────
+// ── FETCH: estrategia Cache First con fallback a red ──
 self.addEventListener('fetch', event => {
-  // Solo interceptar GET
+  // Solo interceptar peticiones GET
   if (event.request.method !== 'GET') return;
 
-  // Firebase / APIs externas: Network-First
-  const url = event.request.url;
-  if (
-    url.includes('firestore.googleapis.com') ||
-    url.includes('firebase') ||
-    url.includes('googleapis.com/identitytoolkit')
-  ) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Todo lo demás: Cache-First
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Solo cachear respuestas válidas
-        if (!response || response.status !== 200 || response.type === 'error') {
-          return response;
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) {
+        // Actualizar en background (stale-while-revalidate)
+        fetch(event.request)
+          .then(networkResponse => {
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, networkResponse.clone());
+              });
+            }
+          })
+          .catch(() => {}); // Sin conexión: usar caché sin error
+        return cachedResponse;
+      }
+
+      // No está en caché: ir a la red y guardar
+      return fetch(event.request).then(networkResponse => {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+          return networkResponse;
         }
-        const toCache = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, toCache));
-        return response;
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
+        return networkResponse;
       }).catch(() => {
-        // Offline fallback: devolver index.html para navegación
+        // Fallback offline: devolver index.html si es una navegación
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
