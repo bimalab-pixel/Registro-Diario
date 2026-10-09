@@ -4986,8 +4986,24 @@ function _riesgoParsearNota(texto, nombre) {
   if (m) datos.hbGdl = parseFloat(m[1].replace(',', '.'));
 
   // Presión arterial: "150/100", "hta 150/100", "pa 120/80"
-  m = t.match(/(\d{2,3})\s*\/\s*(\d{2,3})/);
-  if (m) { datos.paSistolica = parseInt(m[1], 10); datos.paDiastolica = parseInt(m[2], 10); }
+  // IMPORTANTE: se ignoran las fechas (ej. "18/08/2026" no es una PA) y solo se aceptan
+  // valores fisiológicamente posibles. Se prefiere el par que tenga contexto de PA
+  // (PA, TA, presión arterial, HTA, mmHg).
+  {
+    const reParPA = /(?<![\d\/.\-])(\d{2,3})\s*\/\s*(\d{2,3})(?!\s*[\/.\-]\s*\d)(?!\d)/g;
+    const candidatos = [];
+    let mp;
+    while ((mp = reParPA.exec(t)) !== null) {
+      const sis = parseInt(mp[1], 10), dia = parseInt(mp[2], 10);
+      if (sis < 60 || sis > 260 || dia < 30 || dia > 150 || sis <= dia) continue;
+      const antes = t.slice(Math.max(0, mp.index - 40), mp.index);
+      const despues = t.slice(mp.index + mp[0].length, mp.index + mp[0].length + 12);
+      const conContexto = /(?:\bpa\b|\bta\b|presi[oó]n(?:\s+arterial)?|hta|tensi[oó]n)[^\d]{0,25}$/i.test(antes) || /^\s*mm\s*hg/i.test(despues);
+      candidatos.push({ sis, dia, conContexto });
+    }
+    const elegido = candidatos.find(c => c.conContexto) || candidatos[0];
+    if (elegido) { datos.paSistolica = elegido.sis; datos.paDiastolica = elegido.dia; }
+  }
 
   // Glucosa: "glucosa 130", "glicemia 95 mg/dl"
   m = t.match(/\b(?:glucosa|glicemia|glucemia)\b[:\s]*?(\d+(?:[.,]\d+)?)/i);
